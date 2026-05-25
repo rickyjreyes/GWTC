@@ -1,0 +1,142 @@
+# =============================================================================
+# Python / environment
+# =============================================================================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+.venv/
+venv/
+env/
+ENV/
+cupy-env/
+*.egg-info/
+dist/
+build/
+
+# =============================================================================
+# OS / editor
+# =============================================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+
+# =============================================================================
+# Logs / temp
+# =============================================================================
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# =============================================================================
+# Large GWTC / IGWN data release files
+# Keep download scripts and manifests, ignore raw bulk data.
+# =============================================================================
+*.hdf5
+*.h5
+*.fits
+*.fits.gz
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+
+IGWN-GWTC*/
+IGWN-GWTC*_PEDataRelease.hdf5
+IGWN-GWTC*-combined_PEDataRelease.hdf5
+IGWN-GWTC*-PESummaryTable.hdf5
+IGWN-GWTC*-Archived_Skymaps.tar.gz
+
+# Preserve checksums/manifests if intentionally tracked
+!md5sums.txt
+!checksums.txt
+!MANIFEST.md
+!PROVENANCE.md
+!REPRODUCE.md
+!README.md
+!RESULTS.md
+
+# =============================================================================
+# Generated scan outputs
+# Default: ignore generated output folders unless explicitly promoted.
+# =============================================================================
+outputs*/
+outputs_gwtc4_pathfinder/
+outputs_gwtc4_wct/
+outputs_gwtc4_wct_compound/
+outputs_gwtc4_wct_subsets/
+
+# Preserve lightweight directory markers and promoted result summaries
+!outputs/**/.gitkeep
+!outputs/**/README.md
+!outputs/**/RESULTS.md
+!outputs/**/summary.csv
+!outputs/**/summary.json
+!outputs/**/verdict.csv
+!outputs/**/verdict.json
+
+# =============================================================================
+# Generated figures / plots
+# Ignore by default; promote chosen figures manually if needed.
+# =============================================================================
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.pdf
+
+# Allow publication figures if stored in a dedicated tracked folder
+!figures/
+!figures/**/*.png
+!figures/**/*.svg
+!figures/**/*.pdf
+
+# =============================================================================
+# Tables: keep canonical machine-auditable results
+# =============================================================================
+!tables/
+!tables/**/*.csv
+!tables/**/*.json
+!tables/**/*.md
+
+# =============================================================================
+# Data policy
+# Ignore raw heavy data, keep small curated CSV metadata if needed.
+# =============================================================================
+data/raw/
+raw/
+downloads/
+
+# Allow small curated tables
+!data/
+!data/**/*.csv
+!data/**/*.md
+!data/**/*.json
+
+# But still ignore large binary data inside data/
+data/**/*.hdf5
+data/**/*.h5
+data/**/*.fits
+data/**/*.fits.gz
+data/**/*.tar.gz
+data/**/*.zip
+
+# =============================================================================
+# Notebooks
+# Track notebooks only if intentionally curated.
+# =============================================================================
+*.ipynb
+!notebooks/
+!notebooks/**/*.ipynb
