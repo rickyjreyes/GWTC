@@ -1,0 +1,2 @@
+catalog_version,variable,subset,bin_count,k_best,n_star,DeltaD_star,local_p,global_p,null_n,verdict_label,notes
+cumulative,M_chirp,cumulative_pa0.5,20,32.69747899159664,23.129202316812606,80.41047539922894,3.460087833937002e-18,0.003996003996003996,1000,PASS,primary_scan;n_events=277
