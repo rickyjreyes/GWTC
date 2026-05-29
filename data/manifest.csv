@@ -1,0 +1,25 @@
+key,value
+source,GWOSC Event API (official LVK / GWOSC)
+url,https://gwosc.org/eventapi/json/allevents/
+access_date_utc,2026-05-29T01:37:08.554240+00:00
+raw_file,data/gwtc_allevents_raw.json
+sha256,731f167b5545db5b3b4345994fde52730e260bb1112a739051be7f884fca7969
+n_bytes,1267691
+n_event_entries,671
+catalog::GWTC-5.0,161
+catalog::GWTC-4.1,140
+catalog::GWTC-4.0,129
+catalog::GWTC-2.1-confident,54
+catalog::IAS-O3a,42
+catalog::GWTC-2,39
+catalog::GWTC-3-confident,35
+catalog::GWTC-1-marginal,14
+catalog::O1_O2-Preliminary,12
+catalog::GWTC-1-confident,11
+catalog::O3_Discovery_Papers,8
+catalog::O4_Discovery_Papers,8
+catalog::GWTC-3-marginal,7
+catalog::O3_IMBH_marginal,5
+catalog::GWTC-2.1-auxiliary,2
+catalog::GWTC-2.1-marginal,2
+catalog::Initial_LIGO_Virgo,2
