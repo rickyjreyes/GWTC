@@ -1,0 +1,114 @@
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+import numpy as np
+
+SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
+sys.path.insert(0, str(SCRIPTS))
+
+from freeze_gwtc_v4_structured_null import K_BAND, K_PRED  # noqa: E402
+from gwtc_structured_null import (  # noqa: E402
+    StructuredNullParams,
+    fit_structured_null,
+    observed_density_on_grid,
+    sample_structured_null,
+    selection_weight,
+    structured_fixed_statistic_null,
+)
+from gwtc_unbinned_kde import mode_normalizer  # noqa: E402
+
+
+def synthetic_params(gamma: float = 1.5) -> StructuredNullParams:
+    return StructuredNullParams(
+        z_min=5.0,
+        z_max=60.0,
+        alpha_low=-1.2,
+        alpha_high=-3.0,
+        break_z=24.0,
+        peak_fraction=0.22,
+        peak_mu=32.0,
+        peak_sigma=4.5,
+        selection_gamma=gamma,
+        train_neg_loglik=0.0,
+    )
+
+
+def test_published_frequency_is_hard_fixed() -> None:
+    assert K_PRED == 9.7
+    assert K_BAND == (9.5, 10.0)
+
+
+def test_selection_weight_gamma_zero_is_unity() -> None:
+    z = np.array([5.0, 20.0, 60.0])
+    w = selection_weight(z, 60.0, 0.0)
+    np.testing.assert_allclose(w, np.ones_like(z))
+
+
+def test_structured_density_integrates_to_one() -> None:
+    params = synthetic_params()
+    grid = np.geomspace(params.z_min, params.z_max, 5000)
+    density = observed_density_on_grid(grid, params)
+    integral = np.trapz(density, grid)
+    assert np.all(np.isfinite(density))
+    assert np.all(density >= 0.0)
+    assert abs(integral - 1.0) < 2e-5
+
+
+def test_structured_sampling_is_deterministic_and_inside_support() -> None:
+    params = synthetic_params()
+    a = sample_structured_null(np.random.default_rng(1234), params, 200, grid_n=1024)
+    b = sample_structured_null(np.random.default_rng(1234), params, 200, grid_n=1024)
+    np.testing.assert_allclose(a, b, rtol=0.0, atol=0.0)
+    assert np.min(a) >= params.z_min
+    assert np.max(a) <= params.z_max
+
+
+def test_structured_fit_is_training_only_deterministic() -> None:
+    source = synthetic_params(gamma=1.5)
+    train = sample_structured_null(np.random.default_rng(44), source, 90, grid_n=1024)
+    first = fit_structured_null(train, 1.5, grid_n=512)
+    second = fit_structured_null(train, 1.5, grid_n=512)
+    for key, value in first.to_dict().items():
+        assert np.isfinite(value)
+        assert abs(value - second.to_dict()[key]) < 1e-9
+    assert first.z_min <= float(np.min(train))
+    assert first.z_max >= float(np.max(train))
+    assert 0.0 <= first.peak_fraction <= 0.75
+
+
+def test_structured_fixed_statistic_null_is_deterministic() -> None:
+    params = synthetic_params(gamma=2.5)
+    centers = np.linspace(np.log(params.z_min), np.log(params.z_max), 35)
+    bandwidth = 0.18
+    k = 9.7
+    a = 0.08
+    b = 0.22
+    z_norm = mode_normalizer(centers, bandwidth, k, a, b, gh_n=20)
+
+    first = structured_fixed_statistic_null(
+        params=params,
+        n_events=25,
+        k=k,
+        a=a,
+        b=b,
+        normalizer=z_norm,
+        null_n=30,
+        seed=999,
+        grid_n=512,
+    )
+    second = structured_fixed_statistic_null(
+        params=params,
+        n_events=25,
+        k=k,
+        a=a,
+        b=b,
+        normalizer=z_norm,
+        null_n=30,
+        seed=999,
+        grid_n=512,
+    )
+    np.testing.assert_allclose(first, second, rtol=0.0, atol=0.0)
+    assert first.shape == (30,)
+    assert np.all(np.isfinite(first))
