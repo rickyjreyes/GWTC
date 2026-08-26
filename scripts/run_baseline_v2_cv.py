@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Cross-validate flexible smooth baselines for GWTC log-domain counts.
 
-This is deliberately a baseline-only challenge. It does not scan or fit a WCT
-residual. Hyperparameters are selected from training folds using Poisson
-predictive deviance so residual testing can occur only after the smooth
-background model is frozen.
+For the strict holdout protocol, baseline hyperparameters are selected using
+only events assigned to ``train`` in a pre-existing frozen manifest.  No
+holdout values are used during model selection.
 """
 
 from __future__ import annotations
@@ -49,14 +48,52 @@ def fit_poisson_glm(X: np.ndarray, y: np.ndarray) -> np.ndarray:
 
 
 def make_folds(n: int, n_folds: int) -> list[np.ndarray]:
-    # Interleaved deterministic folds preserve coverage across the log domain.
     indices = np.arange(n)
     return [indices[fold::n_folds] for fold in range(n_folds)]
+
+
+def choose_event_column(df: pd.DataFrame) -> str:
+    for name in ("commonName", "common_name", "event", "event_name", "name"):
+        if name in df.columns:
+            return name
+    raise ValueError("No event-name column found in event table")
+
+
+def apply_manifest_split(
+    df: pd.DataFrame,
+    manifest: pd.DataFrame,
+    split: str,
+) -> pd.DataFrame:
+    if not {"event_name", "split"}.issubset(manifest.columns):
+        raise ValueError("Manifest must contain event_name and split columns")
+    if split not in set(manifest["split"].astype(str)):
+        raise ValueError(f"Split {split!r} not present in manifest")
+
+    event_col = choose_event_column(df)
+    wanted = set(manifest.loc[manifest["split"].astype(str) == split, "event_name"].astype(str))
+    work = df.copy()
+    work[event_col] = work[event_col].astype(str)
+
+    if "is_primary_entry" in work.columns:
+        primary = work["is_primary_entry"]
+        if primary.dtype != bool:
+            primary = primary.astype(str).str.lower().isin(("true", "1", "yes"))
+        work = work[primary].copy()
+
+    work = work[work[event_col].isin(wanted)].copy()
+    if work[event_col].duplicated().any():
+        raise ValueError("Duplicate event rows remain after canonical manifest filtering")
+    missing = wanted - set(work[event_col])
+    if missing:
+        raise ValueError(f"{len(missing)} manifest events were not found in canonical event table")
+    return work
 
 
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--input", default="tables/gwtc_events_clean.csv")
+    p.add_argument("--manifest", default="tables/gwtc_holdout_manifest.csv")
+    p.add_argument("--split", default="train")
     p.add_argument("--variable", default="M_chirp")
     p.add_argument("--bins", type=int, default=40)
     p.add_argument("--degrees", default="3,4,5,6,7,8")
@@ -68,6 +105,18 @@ def main() -> None:
     df = pd.read_csv(args.input)
     if args.variable not in df.columns:
         raise SystemExit(f"Variable {args.variable!r} not found in {args.input}")
+
+    manifest_path = Path(args.manifest)
+    if not manifest_path.exists():
+        raise SystemExit(
+            f"Frozen manifest {manifest_path} does not exist. Create it before baseline selection."
+        )
+    manifest = pd.read_csv(manifest_path)
+    try:
+        df = apply_manifest_split(df, manifest, args.split)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
+
     if "p_astro" in df.columns:
         df = df[pd.to_numeric(df["p_astro"], errors="coerce") >= args.p_astro_min]
 
@@ -111,6 +160,7 @@ def main() -> None:
                     "validation_deviance": dev,
                     "n_events": len(z),
                     "p_astro_min": args.p_astro_min,
+                    "data_split": args.split,
                 }
             )
 
@@ -124,6 +174,7 @@ def main() -> None:
                 "validation_deviance": float(np.mean(fold_scores)),
                 "n_events": len(z),
                 "p_astro_min": args.p_astro_min,
+                "data_split": args.split,
             }
         )
 
@@ -140,7 +191,8 @@ def main() -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(path, index=False)
     print(
-        f"Wrote {path}; selected polynomial degree={int(winner['degree'])} "
+        f"Wrote {path}; split={args.split}; n_events={len(z)}; "
+        f"selected polynomial degree={int(winner['degree'])} "
         f"by mean validation deviance={float(winner['validation_deviance']):.6g}"
     )
 
