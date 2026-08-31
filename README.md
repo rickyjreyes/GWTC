@@ -21,54 +21,74 @@ variables.
 ## GWTC-4 population-level aggregate result
 
 The restored historical GWTC-4 subset analysis contains exactly **168 scans =
-56 subset selectors x 3 final-spin pairs**. Recomputing the aggregate statistic
-from the original committed 168-row scan table gives:
+56 subset selectors x 3 final-spin pairs**. Recomputing the historical aggregate
+from the original 168-row scan table gives a very large **nominal** departure
+from an independent-uniform reference:
 
-| aggregate statistic | literal result | nominal one-sided Gaussian equivalent |
-|---|---:|---:|
-| p-value distribution nonuniformity | `chi^2 = 95.630952`, `p = 4.06578e-16` | **`Z = 8.0522 sigma`** |
-| 47 / 168 scans with `p < 0.10` | Poisson(`lambda=16.8`): `p = 1.16e-9`; exact Binomial(168, 0.10): `p = 4.85e-11` | **5.97 sigma Poisson / 6.47 sigma exact-binomial** |
-| 16 / 168 scans with `p < 0.05` | Poisson(`lambda=8.4`): `p = 0.0125`; exact Binomial(168, 0.05): `p = 0.0105` | about **2.24-2.31 sigma** |
+| statistic | result | interpretation |
+|---|---:|---|
+| historical p-vector histogram | `chi^2 = 95.630952`, `p = 4.06578e-16` | nominal `Z = 8.0522 sigma` |
+| historical count `p < 0.10` | 47 / 168 | 5.97 sigma Poisson / 6.47 sigma exact-binomial marginally |
+| historical count `p < 0.05` | 16 / 168 | about 2.24-2.31 sigma marginally |
 
 The historical paper text says "11 equal bins," while its plotted bins and
 reported expected counts correspond to `[0,.05]`, `[.05,.10]`, followed by
 nine width-`.10` bins. The audit uses those figure-compatible bin edges because
 they reproduce the stated expectations 8.4, 8.4, then 16.8 for `N = 168`.
 
-Run the nominal observed-vector calculation directly:
+### Correlation-aware outer-null result
 
-```bash
-python scripts/run_gwtc_population_global_null.py \
-  --observed tables/gwtc4_population_observed.csv \
-  --p-column scan_null_p \
-  --output tables/gwtc4_population_global_result.json
-```
+The exact historical scan implementation was restored and independently
+reproduced before null generation:
 
-The **8.0522-sigma value is a nominal aggregate p-to-Z conversion**, not a
-single-event significance and not a globally calibrated WCT discovery claim.
-The 168 scans overlap heavily through shared events, rankings, and subset
-selectors.
+- 86 events;
+- 168 scans;
+- 56 unique subsets;
+- 3 final-spin scan pairs;
+- maximum reconstructed `k_best` difference `7.11e-15`;
+- maximum reconstructed `Delta chi^2` difference `7.43e-09`;
+- **observed reproduction: PASS**.
 
-The exact historical scanner is preserved as
-`scripts/gwtc4_wct_subset_scan_compound.py`, and the restored scan vector is
-committed as `tables/gwtc4_population_observed.csv`.
+A 200-catalog outer permutation ensemble then reran the same 168-scan selector
+architecture while permuting finite `final_spin_median` values across event
+labels. The resulting per-scan outer-calibrated p-vector is strongly nonuniform
+if incorrectly compared with an independent continuous chi-square reference
+(`chi^2 = 164.61905`, nominal `Z = 11.3526 sigma`), but that analytic conversion
+is **not valid for the dependent, discrete rank-calibrated p-values**.
 
-A correlation-aware outer-null generator is now provided as
-`scripts/generate_gwtc4_population_null_matrix.py`. It permutes finite
-`final_spin_median` values across event labels while keeping event-specific
-uncertainty weights and all non-final-spin catalog quantities fixed, then
-rebuilds the same historical 56 subset rules and 3 final-spin pairs. Before
-producing null catalogs it recomputes all 168 historical scan-max statistics
-and aborts unless the restored event summary reproduces them.
+The scientifically relevant comparison is the observed population statistic to
+the **complete correlated null-catalog population statistics**:
+
+| correlation-aware statistic | empirical result |
+|---|---:|
+| population histogram chi-square | **`p = 0.094527` (`Z = 1.313 sigma`)** |
+| excess count below `p < 0.10` | **`p = 0.054726`** |
+| outer catalogs | 200 |
+| Monte Carlo resolution floor | `1 / 201 = 0.004975` |
+
+**Conclusion:** under this stated final-spin event-label permutation null, the
+historical population anomaly is **not globally significant**. The earlier
+8.0522-sigma value is retained only as a nominal independence-based diagnostic;
+it must not be described as a >5-sigma catalog-level result. The dependence
+among overlapping subsets/selectors is large enough to explain the apparent
+population excess in this calibration.
+
+This outer null is not a full LVK astrophysical population model, so the result
+is a statement about this explicit permutation null rather than a universal
+proof of no structure. Additional null models can test robustness, but the
+current repository contains **no globally calibrated >5-sigma GWTC-4 population
+result**.
+
+Reproduce the sequence:
 
 ```bash
 # Verify restored historical scan implementation
 python scripts/generate_gwtc4_population_null_matrix.py --verify-only
 
-# Generate a dependence-preserving outer-null ensemble
+# Generate the 200-catalog correlated outer null
 python scripts/generate_gwtc4_population_null_matrix.py --outer-n 200
 
-# Calibrate the population statistic against complete correlated null vectors
+# Calibrate the complete population statistic
 python scripts/run_gwtc_population_global_null.py \
   --observed tables/gwtc4_population_observed_outercal.csv \
   --p-column outer_global_p \
@@ -76,11 +96,10 @@ python scripts/run_gwtc_population_global_null.py \
   --output tables/gwtc4_population_global_result.json
 ```
 
-This outer null directly addresses selector/event-overlap dependence under the
-stated **final-spin event-label permutation null**. It is not a full LVK
-astrophysical population model, so any surviving significance must be reported
-with the null model named explicitly. See [REPRODUCE.md](REPRODUCE.md) for the
-full procedure and resolution limits.
+The exact historical scanner is preserved as
+`scripts/gwtc4_wct_subset_scan_compound.py`, and the restored scan vector is
+committed as `tables/gwtc4_population_observed.csv`. See
+[REPRODUCE.md](REPRODUCE.md) for the full procedure and null-model limitations.
 
 This historical aggregate result is intentionally kept separate from the
 current stricter diagnostic verdict in [RESULTS.md](RESULTS.md). The current
