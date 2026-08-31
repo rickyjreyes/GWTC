@@ -26,42 +26,44 @@ discrimination**; a null non-pass is not a causal explanation.
       power law + truncated Gaussian peak, no periodic term, with predeclared
       selection exponents `gamma = 0.0, 1.5, 2.5`.
 - [x] V4 training-only definition frozen and committed at `k = 9.7`, including
-      frozen amplitude and phase. Holdout evaluation is not performed by the
-      freeze step.
+      frozen amplitude and phase.
+- [x] V4 one-shot evaluation completed with `Delta 2logL = 9.95018558` and
+      **`PASS_ALL_STRUCTURED_NULLS`**:
+      - `gamma = 0.0`: `55/10000`, `p = 0.0055994401`
+      - `gamma = 1.5`: `1/10000`, `p = 0.0001999800`
+      - `gamma = 2.5`: `2/10000`, `p = 0.0002999700`
+      - worst-case `p = 0.0055994401`
+- [x] V4 result preserved in `tables/gwtc_v4_structured_null_result.csv`.
 - [x] Tests for structured-null normalization, deterministic fitting/sampling,
-      frozen frequency, and deterministic fixed-statistic null generation.
+      frozen frequency, phase-specific signal definition, and deterministic
+      fixed-statistic null generation.
+
+## Current interpretation
+
+The V4 result shows that the exact frozen `k = 9.7`, amplitude, and phase
+statistic is uncommon under **all three declared non-periodic structured
+population scenarios**. This strengthens the fixed-mode GWTC evidence beyond
+the original binned scan and beyond V3's KDE robustness test.
+
+It does **not** replace a full LVK hierarchical population/selection analysis,
+and GWTC-5 had already been inspected in earlier V2/V3 work, so V4 is a
+robustness/source-discrimination challenge rather than an independent future
+catalog replication.
 
 ## Immediate next action
-
-- [ ] **Run the one-shot V4 evaluator exactly as frozen**:
-
-  ```bash
-  python -m pytest -q --basetemp=.pytest_tmp
-  python scripts/evaluate_gwtc_v4_structured_null.py \
-    --null-n 10000 \
-    --seed 2718281
-  ```
-
-  Then hash and commit `tables/gwtc_v4_structured_null_result.csv` without
-  changing `k`, `a,b`, selection exponents, structured-population family, or
-  decision threshold.
-
-- [ ] Interpret V4 only as **distinguished / not distinguished from the declared
-      non-periodic null family**. Do not translate a non-pass into "ordinary
-      astrophysics caused the signal" and do not translate a pass directly into
-      WCT confirmation.
-
-## After V4
 
 - [ ] **Full hierarchical population/selection challenge**: propagate event
       posteriors and use injection-calibrated selection effects (or an equivalent
       validated detection-efficiency model) while keeping the residual mode
-      externally frozen. This is the strongest conventional source-discrimination
-      test still missing.
+      externally frozen. This is now the strongest conventional
+      source-discrimination test still missing.
 - [ ] **Independent future-catalog replication**: freeze the exact dimensionless
       mode before a genuinely unseen GWTC release and evaluate once, with no
       retraining on the future catalog. This would carry more evidentiary weight
       than further reanalysis of the already-inspected GWTC-5 holdout.
+
+## Additional follow-up
+
 - [ ] Historical **mode-coherence diagnostic**: instead of only aggregating 168
       marginal p-values, test recurrence/coherence of saved `k_best`, `n_obs`,
       and phase across overlapping subsets using complete-catalog outer nulls.
