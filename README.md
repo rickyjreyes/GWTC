@@ -49,29 +49,34 @@ reproduced before null generation:
 - maximum reconstructed `Delta chi^2` difference `7.43e-09`;
 - **observed reproduction: PASS**.
 
-A 200-catalog outer permutation ensemble then reran the same 168-scan selector
-architecture while permuting finite `final_spin_median` values across event
-labels. The resulting per-scan outer-calibrated p-vector is strongly nonuniform
-if incorrectly compared with an independent continuous chi-square reference
-(`chi^2 = 164.61905`, nominal `Z = 11.3526 sigma`), but that analytic conversion
-is **not valid for the dependent, discrete rank-calibrated p-values**.
+A first 200-catalog outer permutation ensemble gave a population histogram
+`p = 0.094527` (`Z = 1.313 sigma`). A separate **1000-catalog** run with a new
+seed (`20260901`) reproduced the same conclusion and is the primary quoted
+correlation-aware calibration:
 
-The scientifically relevant comparison is the observed population statistic to
-the **complete correlated null-catalog population statistics**:
+| correlation-aware statistic | 200 catalogs | **1000 catalogs** |
+|---|---:|---:|
+| population histogram chi-square global p | 0.094527 | **0.103896** |
+| population histogram global Z | 1.313 sigma | **1.260 sigma** |
+| excess count below `p < 0.10` global p | 0.054726 | **0.062937** |
+| observed count below `p < 0.05` | 43 | **42** |
+| observed count below `p < 0.10` | 52 | **52** |
+| MC resolution floor | 0.004975 | **0.000999** |
 
-| correlation-aware statistic | empirical result |
-|---|---:|
-| population histogram chi-square | **`p = 0.094527` (`Z = 1.313 sigma`)** |
-| excess count below `p < 0.10` | **`p = 0.054726`** |
-| outer catalogs | 200 |
-| Monte Carlo resolution floor | `1 / 201 = 0.004975` |
+For the 1000-catalog run, the outer-calibrated observed p-vector itself has
+`chi^2 = 167.11905` and an analytic independent-uniform conversion of
+`p = 1.09489e-30` (`11.4562 sigma`). **That analytic conversion is not a valid
+global significance**, because these rank-calibrated p-values are discrete and
+strongly dependent. The scientifically relevant result is the empirical
+complete-vector comparison above: **`p = 0.103896`, `Z = 1.25966 sigma`**.
 
 **Conclusion:** under this stated final-spin event-label permutation null, the
 historical population anomaly is **not globally significant**. The earlier
-8.0522-sigma value is retained only as a nominal independence-based diagnostic;
-it must not be described as a >5-sigma catalog-level result. The dependence
-among overlapping subsets/selectors is large enough to explain the apparent
-population excess in this calibration.
+8.0522-sigma historical value is retained only as a nominal independence-based
+diagnostic; it must not be described as a >5-sigma catalog-level result. The
+200- and 1000-catalog calibrations agree closely, showing that the dependence
+among overlapping subsets/selectors explains the apparent population excess
+under this null.
 
 This outer null is not a full LVK astrophysical population model, so the result
 is a statement about this explicit permutation null rather than a universal
@@ -79,21 +84,29 @@ proof of no structure. Additional null models can test robustness, but the
 current repository contains **no globally calibrated >5-sigma GWTC-4 population
 result**.
 
-Reproduce the sequence:
+Reproduce the primary 1000-catalog robustness calibration:
 
 ```bash
 # Verify restored historical scan implementation
-python scripts/generate_gwtc4_population_null_matrix.py --verify-only
+python scripts/generate_gwtc4_population_null_matrix.py \
+  --verify-only \
+  --metadata tables/gwtc4_population_null_verify.json
 
-# Generate the 200-catalog correlated outer null
-python scripts/generate_gwtc4_population_null_matrix.py --outer-n 200
+# Generate the 1000-catalog correlated outer null
+python scripts/generate_gwtc4_population_null_matrix.py \
+  --outer-n 1000 \
+  --seed 20260901 \
+  --metadata tables/gwtc4_population_null_metadata_1000.json \
+  --output-matrix tables/gwtc4_population_null_matrix_1000.csv \
+  --output-observed tables/gwtc4_population_observed_outercal_1000.csv \
+  --output-delta tables/gwtc4_population_null_delta_matrix_1000.csv
 
 # Calibrate the complete population statistic
 python scripts/run_gwtc_population_global_null.py \
-  --observed tables/gwtc4_population_observed_outercal.csv \
+  --observed tables/gwtc4_population_observed_outercal_1000.csv \
   --p-column outer_global_p \
-  --null-matrix tables/gwtc4_population_null_matrix.csv \
-  --output tables/gwtc4_population_global_result.json
+  --null-matrix tables/gwtc4_population_null_matrix_1000.csv \
+  --output tables/gwtc4_population_global_result_1000.json
 ```
 
 The exact historical scanner is preserved as
