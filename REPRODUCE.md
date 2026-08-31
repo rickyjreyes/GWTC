@@ -81,17 +81,66 @@ python scripts/make_gwtc_verdict.py --primary-variable M_chirp \
 # -> tables/gwtc_verdict.csv, outputs/summary/VERDICT.txt
 ```
 
-## 9. One-shot
+## 9. One-shot current diagnostic
 
 ```bash
 bash run_all.sh    # convenience wrapper for steps 5-8 (see repo root)
 ```
+
+## 10. Historical GWTC-4 168-scan population calibration
+
+The historical analysis reported 168 scan-max p-values. The analytic population
+statistic is reproduced from the observed p-value vector with:
+
+```bash
+python scripts/run_gwtc_population_global_null.py \
+  --observed tables/gwtc4_population_observed.csv \
+  --output tables/gwtc4_population_global_result.json
+```
+
+For the **actual correlated catalog-level global-null test**, supply a matrix
+created by rerunning the identical 168-scan workflow on complete null catalogs:
+
+```bash
+python scripts/run_gwtc_population_global_null.py \
+  --observed tables/gwtc4_population_observed.csv \
+  --null-matrix tables/gwtc4_population_null_matrix.csv \
+  --output tables/gwtc4_population_global_result.json
+```
+
+Required formats:
+
+- `gwtc4_population_observed.csv`: exactly 168 rows with one p-value column
+  named `p_scanmax`, `global_p`, `p_value`, or `p` (or specify `--p-column`).
+- `gwtc4_population_null_matrix.csv`: one complete null catalog per row and
+  exactly 168 p-value columns in the same scan-definition order as the observed
+  vector. Metadata columns may be present if they are nonnumeric; alternatively
+  prefix all scan columns (for example `scan_000` ... `scan_167`) and pass
+  `--null-prefix scan_`.
+
+The historical statistic uses bin edges
+`[0,.05,.10,.20,.30,.40,.50,.60,.70,.80,.90,1.0]`. This is the 11-bin
+construction consistent with the reported expected counts 8.4, 8.4, then 16.8
+for `N=168`.
+
+**Do not use 168 independent Uniform(0,1) draws per row as the null matrix.**
+That would erase the overlap/correlation among ranking and subset selectors and
+would only reproduce the nominal analytic test. To support a globally
+calibrated discovery-level statement, each null row must come from one complete
+synthetic/null catalog passed through the same 168-scan pipeline.
+
+The empirical Monte Carlo p-value uses the standard plus-one correction
+`(1 + N_ge) / (1 + N_null_catalogs)`. Therefore direct resolution below the
+one-sided 5-sigma threshold requires roughly 3.49 million null catalogs if no
+null realization exceeds the observed aggregate statistic.
 
 ## Outputs
 
 - `tables/gwtc_*.csv` — canonical results (one schema; see METHOD.md §6).
 - `outputs/summary/VERDICT.txt` — human-readable verdict.
 - `outputs/summary/scan_*.csv`, `outputs/summary/*.png` — scan curves / plots.
+- `tables/gwtc4_population_global_result.json` — analytic and, when supplied,
+  empirical catalog-level population calibration.
 
 ## Seeds
 
