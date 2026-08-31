@@ -7,25 +7,46 @@ inference.** All results below are reproducible via [REPRODUCE.md](REPRODUCE.md)
 ## Historical GWTC-4 population-level aggregate result
 
 A prior GWTC-4 catalog-scan analysis reported a strong departure from uniformity
-across **168 scan-max p-values**:
+across **168 scan-max p-values**. The repository now audits the reported
+arithmetic explicitly:
 
-| population statistic | reported result | nominal one-sided Gaussian equivalent |
-|---|---:|---:|
-| distribution nonuniformity | `chi^2 = 95.6`, `p_unif < 1e-15` | **`Z > 7.94 sigma`** |
-| count excess at `p < 0.10` | 47 / 168 observed vs 16.8 expected; Poisson-tail `p < 1e-10` | **`Z > 6.36 sigma`** |
+| population statistic | historical report | literal recomputation | nominal one-sided Z |
+|---|---:|---:|---:|
+| distribution nonuniformity | `chi^2 = 95.6`, `p_unif < 1e-15` | `p = 4.12e-16` for `df = 10` | **8.05 sigma** |
+| count at `p < 0.10` | 47 / 168; labeled Poisson-tail `p < 1e-10` | Poisson(`lambda=16.8`) `p = 1.16e-9`; exact Binomial(168,0.10) `p = 4.85e-11` | **5.97 sigma Poisson / 6.47 sigma exact-binomial** |
+| count at `p < 0.05` | 16 / 168; labeled Poisson-tail `p = 1.4e-3` | Poisson(`lambda=8.4`) `p = 0.0125`; exact Binomial(168,0.05) `p = 0.0105` | about **2.24-2.31 sigma** |
 
-These are **aggregate population statistics**, not individual-event or
-single-subset significances. The sigma values are nominal Gaussian-equivalent
-conversions of the reported analytic p-values. Because the catalog scans are
-partially overlapping/correlated, these values should **not** be presented as a
-globally calibrated `>7.9 sigma` WCT detection.
+The paper text describes "11 equal bins," but its figure and expected counts
+correspond to `[0,.05]`, `[.05,.10]`, then nine width-`.10` bins. The audit uses
+the figure-compatible construction, which gives expected counts 8.4, 8.4, then
+16.8 for `N = 168`.
 
-The repository now includes
-`scripts/run_gwtc_population_global_null.py`, which computes the historical
-population statistic from the observed 168 p-values and, when given an
-end-to-end null-catalog matrix, calibrates the aggregate statistic while
-preserving the empirical dependence among scans. See [REPRODUCE.md](REPRODUCE.md)
-for the command and required input formats.
+The key correction is that the historical `47/168` result **is above 5 sigma
+under both the literal Poisson approximation and the exact binomial marginal
+count test**, but the previously reported label `Poisson p < 1e-10` is not the
+literal Poisson result. The exact binomial tail does satisfy `p < 1e-10`.
+Likewise, the historical `16/168` Poisson-tail value does not reproduce under
+the stated calculation.
+
+These remain **aggregate population statistics**, not individual-event or
+single-subset significances. More importantly, all of the analytic/count
+significances above assume a reference distribution that does not fully account
+for dependence among the partially overlapping catalog scans. They should
+therefore **not** be presented as a globally calibrated `8.05 sigma` WCT
+detection.
+
+The repository includes `scripts/run_gwtc_population_global_null.py`, which:
+
+1. audits the historical reported numbers with `--audit-reported`;
+2. recomputes the aggregate statistic from the actual observed 168-value
+   p-vector when supplied; and
+3. calibrates the final statistic against complete null-catalog 168-scan vectors
+   when an end-to-end null matrix is supplied.
+
+The exact historical 168-value scan vector and selector manifest are not
+currently committed in this repository, so the arithmetic audit is reproducible
+now but a complete reconstruction of the historical scan ensemble remains open.
+See [REPRODUCE.md](REPRODUCE.md) for the commands and input format.
 
 A definitive global-significance statement requires a catalog-level null
 ensemble that reproduces the complete selection, ranking, scan, and aggregation
