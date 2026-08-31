@@ -47,7 +47,7 @@ to reproduce all historical scan maxima from the saved event summary:
 | reproduction | **PASS** |
 
 This closes the earlier reconstruction gap: the historical selector/scanner
-architecture is now reproducible from the restored files.
+architecture is reproducible from the restored files.
 
 ### Correlation-aware catalog-level outer null
 
@@ -57,46 +57,51 @@ keeping event identity, non-final-spin variables, missingness, and the historica
 weighting/selector architecture fixed. Each outer catalog is passed through the
 same 168 scan definitions.
 
-For the first **200 outer catalogs**:
+Two independent-size calibrations were run:
 
-- fixed-membership scans: 147;
-- dynamic-selector scans rebuilt per permutation: 21;
-- per-scan Monte Carlo floor: `1/201 = 0.0049751244`;
-- observed outer-calibrated count `p < 0.05`: 43;
-- observed outer-calibrated count `p < 0.10`: 52.
+| quantity | 200 catalogs | **1000 catalogs** |
+|---|---:|---:|
+| fixed-membership scans | 147 | 147 |
+| dynamic-selector scans | 21 | 21 |
+| observed outer-calibrated count `p < 0.05` | 43 | **42** |
+| observed outer-calibrated count `p < 0.10` | 52 | **52** |
+| MC floor | 0.004975 | **0.000999** |
+| histogram chi-square global p | 0.094527 | **0.103896** |
+| histogram chi-square global Z | 1.31338 sigma | **1.25966 sigma** |
+| count-below-0.10 global p | 0.054726 | **0.062937** |
 
-The outer-calibrated observed p-vector itself has
-`chi^2 = 164.61905` and an analytic independent-uniform conversion of
-`p = 3.6006e-30` (`11.3526 sigma`). **That analytic conversion is not a valid
-global significance**, because these rank-calibrated p-values are both discrete
-and strongly dependent.
+The 1000-catalog run used seed `20260901` and is now the primary quoted
+correlation-aware result. Its outer-calibrated observed p-vector has
+`chi^2 = 167.11905` and an analytic independent-uniform conversion of
+`p = 1.09489e-30` (`11.4562 sigma`). **That analytic conversion is not a valid
+global significance**, because these rank-calibrated p-values are discrete and
+strongly dependent.
 
-The valid comparison is against the complete correlated null-catalog
-population statistics:
+The valid complete-vector comparison is therefore:
 
-| end-to-end statistic | empirical result |
-|---|---:|
-| histogram chi-square global p | **0.094527363** |
-| histogram chi-square global Z | **1.31338 sigma** |
-| count-below-0.10 global p | **0.054726368** |
-| outer catalogs | 200 |
-| MC resolution floor | 0.0049751244 |
+\[
+p_{\rm global}=0.1038961,\qquad Z_{\rm global}=1.25966\,\sigma.
+\]
 
-**Result:** under the stated final-spin event-label permutation null, the
-historical GWTC-4 population anomaly is **not globally significant**. The
-nominal 8.0522-sigma historical value collapses to an empirical
-**1.31-sigma catalog-level result** after selector/event-overlap dependence is
-included.
+The 200- and 1000-catalog results agree closely despite the larger ensemble and
+changed seed. The population anomaly therefore does **not** approach a discovery
+threshold under this stated null; it lies near a 10% global tail probability.
+
+**Result:** under the final-spin event-label permutation null, the historical
+GWTC-4 population anomaly is **not globally significant**. The nominal
+8.0522-sigma historical value is reduced to an empirical **1.26-sigma
+catalog-level result** after selector/event-overlap dependence is included.
 
 Therefore this repository contains **no globally calibrated >5-sigma GWTC-4
 population result**. The old >5-sigma values are retained only to document the
-historical marginal calculation and the size of the dependence correction.
+historical marginal calculation and demonstrate the size of the dependence
+correction.
 
 This permutation null is not a complete LVK astrophysical population model; it
 tests a specific exchangeability null for final spin under the recovered
 selector architecture. Additional astrophysical/measurement-aware nulls are
-useful robustness checks, but the current correlated result already invalidates
-the earlier independent-uniform >5-sigma interpretation.
+useful robustness checks, but increasing the number of permutations of this
+same null is not expected to change the qualitative conclusion.
 
 ## Catalog source and event counts
 
