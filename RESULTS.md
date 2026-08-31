@@ -17,13 +17,15 @@ null model provides a unique physical explanation.
 | GWTC-4 dependence-aware N0–N3 outer nulls | empirical global `0.18–1.52 sigma` on the same p-vector histogram statistic | The **historical aggregate statistic** is not globally calibrated >5 sigma under these nulls. This is not a proof that the catalog structure is nonphysical. |
 | Strict frozen holdout V1 | `holdout_p = 0.00129987`, `PASS_FIXED_MODE` | A training-frozen chirp-mass mode predicts the declared holdout under the frozen polynomial-baseline protocol. |
 | Unbinned KDE V3 | `Delta 2logL = 10.0122`, `8/10000` null exceedances, `p = 0.00089991`, `PASS_ROBUSTNESS_FIXED_MODE` | The frozen mode survives removal of histogram binning and replacement of the polynomial baseline by a training-only Gaussian KDE. GWTC-5 was already inspected in V2, so this is robustness rather than a new independent catalog replication. |
-| Structured astrophysical-null V4 | **frozen; result not yet committed** | Tests the exact frozen `k = 9.7`, amplitude, and phase against non-periodic broken-power-law + Gaussian-peak population models with predeclared selection weighting. |
+| Structured astrophysical-null V4 | `PASS_ALL_STRUCTURED_NULLS`; worst-case `p = 0.00559944` | The exact frozen `k = 9.7`, amplitude and phase statistic is uncommon under all three declared non-periodic broken-power-law + Gaussian-peak population scenarios. This remains a robustness/source-discrimination test, not a full LVK hierarchical population analysis or independent future-catalog replication. |
 
 Committed fixed-mode results:
 
 - `tables/gwtc_frozen_holdout_result.csv`
 - `tables/gwtc_v3_unbinned_kde_holdout_result.csv`
-- `tables/gwtc_v4_frozen_structured_null.json` (frozen V4 definition; evaluation pending)
+- `tables/gwtc_v4_frozen_structured_null.json`
+- `tables/gwtc_v4_structured_null_result.csv`
+- `GWTC_V4_STRUCTURED_NULL_RESULT.md`
 
 The current inferential emphasis is therefore **prediction and exact mode
 survival**, not the historical count of small p-values.
@@ -34,9 +36,9 @@ A critical interpretive rule for the repository is:
 > statistic is not diagnostic between the observed catalog and that null. It
 > does **not** prove that the null's physical mechanism caused the observation.
 
-Likewise, a structured-null pass would show that the exact frozen mode is
-uncommon under that declared non-periodic family; it would not by itself prove
-WCT or replace a full LVK hierarchical population/selection analysis.
+Conversely, the V4 pass shows that the exact frozen mode is uncommon under the
+declared non-periodic structured family. It does not by itself prove WCT or
+replace a full LVK hierarchical population/selection analysis.
 
 ## Historical GWTC-4 population-level aggregate result
 
@@ -223,8 +225,8 @@ See [V3_REPRODUCE.md](V3_REPRODUCE.md).
 
 ## V4 — frozen non-periodic structured-population challenge
 
-V4 is the current attribution-focused test. It was frozen before its evaluator
-is run. It fixes the externally published `k = 9.7` and training-fit residual
+V4 is the attribution-focused robustness test. It was frozen before evaluation.
+It fixes the externally published `k = 9.7` and training-fit residual
 coefficients, including phase and amplitude, while the null population is a
 **non-periodic** continuous broken power law plus truncated Gaussian peak. Three
 predeclared selection-weight scenarios use `gamma = 0.0, 1.5, 2.5`.
@@ -239,17 +241,41 @@ The committed frozen V4 model has:
 | training Delta 2logL | `12.29726575` |
 | equivalent mass ratio `exp(2pi/k)` | `1.9112377381` |
 
-The V4 evaluator cannot scan `k`, refit `a,b`, refit the structured population,
-or change the selection scenarios. Its result should be interpreted as a
-**discrimination test between the exact frozen mode and the declared
-non-periodic structured null family**, not as a binary judgment on whether
-GWTC contains real structure.
+The one-shot holdout evaluation produced:
 
-At the time of this status update, no committed
-`tables/gwtc_v4_structured_null_result.csv` is present. The V4 result is
-therefore **pending**, not inferred from earlier null studies.
+| selection gamma | null >= observed | null N | empirical p | verdict |
+|---:|---:|---:|---:|---|
+| `0.0` | `55` | `10000` | **`0.0055994401`** | `PASS_STRUCTURED_NULL_SCENARIO` |
+| `1.5` | `1` | `10000` | **`0.0001999800`** | `PASS_STRUCTURED_NULL_SCENARIO` |
+| `2.5` | `2` | `10000` | **`0.0002999700`** | `PASS_STRUCTURED_NULL_SCENARIO` |
 
-See [V4_REPRODUCE.md](V4_REPRODUCE.md).
+Observed holdout `Delta 2logL = 9.95018558`.
+
+Worst-case p across the three predeclared scenarios:
+
+```text
+0.005599440055994401
+```
+
+Overall verdict:
+
+```text
+PASS_ALL_STRUCTURED_NULLS
+```
+
+The evaluator did not scan `k`, refit `a,b`, refit the structured population,
+or change the selection scenarios on the holdout. The result therefore shows
+that the **exact frozen mode is uncommon under all three declared non-periodic
+structured-population scenarios**.
+
+The result remains bounded by the declared V4 null family. It is not a full
+hierarchical LVK population/selection calculation and is not an independent
+future-catalog replication. The next conventional challenge is posterior-aware
+population inference with injection-calibrated selection effects while keeping
+the residual mode externally frozen.
+
+See [GWTC_V4_STRUCTURED_NULL_RESULT.md](GWTC_V4_STRUCTURED_NULL_RESULT.md) and
+[V4_REPRODUCE.md](V4_REPRODUCE.md).
 
 ## Catalog source and event counts
 
@@ -309,5 +335,5 @@ hypotheses to discriminate. V3 and V4 were built specifically to move beyond
 that ambiguity.
 
 The historical aggregate, V1 fixed holdout, V3 unbinned robustness result, and
-V4 structured-null challenge should therefore be reported separately rather
-than compressed into one verdict label.
+V4 structured-null pass should therefore be reported separately rather than
+compressed into one verdict label.
