@@ -4,6 +4,28 @@ WCT-motivated GWTC log-domain residual diagnostic. **This is a diagnostic
 harness only — it does not prove WCT and does not replace LVK population
 inference.** All results below are reproducible via [REPRODUCE.md](REPRODUCE.md).
 
+## Historical GWTC-4 population-level aggregate result
+
+A prior GWTC-4 catalog-scan analysis reported a strong departure from uniformity
+across **168 scan-max p-values**:
+
+| population statistic | reported result | nominal one-sided Gaussian equivalent |
+|---|---:|---:|
+| distribution nonuniformity | `chi^2 = 95.6`, `p_unif < 1e-15` | **`Z > 7.94 sigma`** |
+| count excess at `p < 0.10` | 47 / 168 observed vs 16.8 expected; Poisson-tail `p < 1e-10` | **`Z > 6.36 sigma`** |
+
+These are **aggregate population statistics**, not individual-event or
+single-subset significances. The sigma values are nominal Gaussian-equivalent
+conversions of the reported analytic p-values. Because the catalog scans are
+partially overlapping/correlated, these values should **not** be presented as a
+globally calibrated `>7.9 sigma` WCT detection.
+
+A definitive global-significance statement requires a catalog-level null
+ensemble that reproduces the complete selection, ranking, scan, and aggregation
+workflow and directly calibrates the final population statistic under the null.
+The historical aggregate result is therefore reported here for completeness but
+is **not used to assign the current repository verdict** below.
+
 ## Catalog source and event counts
 
 - **Source**: official GWOSC Event API,
