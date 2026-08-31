@@ -36,7 +36,7 @@ reported expected counts correspond to `[0,.05]`, `[.05,.10]`, followed by
 nine width-`.10` bins. The audit uses those figure-compatible bin edges because
 they reproduce the stated expectations 8.4, 8.4, then 16.8 for `N = 168`.
 
-### Correlation-aware outer-null result
+### Reproduction and correlation-aware calibration
 
 The exact historical scan implementation was restored and independently
 reproduced before null generation:
@@ -49,50 +49,75 @@ reproduced before null generation:
 - maximum reconstructed `Delta chi^2` difference `7.43e-09`;
 - **observed reproduction: PASS**.
 
-A first 200-catalog outer permutation ensemble gave a population histogram
-`p = 0.094527` (`Z = 1.313 sigma`). A separate **1000-catalog** run with a new
-seed (`20260901`) reproduced the same conclusion and is the primary quoted
-correlation-aware calibration:
+The first full event-label permutation null (N0) was run at both 200 and 1000
+catalogs. The independent 1000-catalog run is the primary N0 calibration:
 
-| correlation-aware statistic | 200 catalogs | **1000 catalogs** |
+| N0 statistic | 200 catalogs | **1000 catalogs** |
 |---|---:|---:|
 | population histogram chi-square global p | 0.094527 | **0.103896** |
 | population histogram global Z | 1.313 sigma | **1.260 sigma** |
 | excess count below `p < 0.10` global p | 0.054726 | **0.062937** |
-| observed count below `p < 0.05` | 43 | **42** |
-| observed count below `p < 0.10` | 52 | **52** |
 | MC resolution floor | 0.004975 | **0.000999** |
 
-For the 1000-catalog run, the outer-calibrated observed p-vector itself has
-`chi^2 = 167.11905` and an analytic independent-uniform conversion of
-`p = 1.09489e-30` (`11.4562 sigma`). **That analytic conversion is not a valid
-global significance**, because these rank-calibrated p-values are discrete and
-strongly dependent. The scientifically relevant result is the empirical
-complete-vector comparison above: **`p = 0.103896`, `Z = 1.25966 sigma`**.
+The 1000-catalog rank-calibrated observed p-vector itself gives a nominal
+independent-uniform `Z = 11.4562 sigma`, but that conversion is **not a valid
+global significance** because those p-values are discrete and strongly
+dependent. The complete-vector empirical comparison is the scientifically
+relevant result.
 
-**Conclusion:** under this stated final-spin event-label permutation null, the
-historical population anomaly is **not globally significant**. The earlier
-8.0522-sigma historical value is retained only as a nominal independence-based
-diagnostic; it must not be described as a >5-sigma catalog-level result. The
-200- and 1000-catalog calibrations agree closely, showing that the dependence
-among overlapping subsets/selectors explains the apparent population excess
-under this null.
+### Prespecified null-sensitivity study
 
-This outer null is not a full LVK astrophysical population model, so the result
-is a statement about this explicit permutation null rather than a universal
-proof of no structure. Additional null models can test robustness, but the
-current repository contains **no globally calibrated >5-sigma GWTC-4 population
-result**.
+To test whether unrestricted final-spin exchangeability was itself too
+destructive, the observed 168-scan analysis was frozen and three additional
+nulls were declared **before seeing their results**. Only the catalog-level null
+model changed.
 
-Reproduce the primary 1000-catalog robustness calibration:
+| null | structure deliberately preserved | empirical histogram global p | global Z | count `p<0.10` global p |
+|---|---|---:|---:|---:|
+| N0 full event-label permutation | selector/event overlap and non-spin catalog quantities | `0.103896` | `1.260 sigma` | `0.062937` |
+| N1 mass-stratified permutation | broad total-mass association | `0.344655` | `0.400 sigma` | `0.171828` |
+| N2 mass+precision stratified | broad mass and spin-precision association | `0.428571` | `0.180 sigma` | `0.128871` |
+| N3 smooth mass-spin residual permutation | smooth degree-2 broad mass-spin relation | `0.063936` | `1.523 sigma` | `0.037962` |
+
+All alternative runs used 1000 complete outer catalogs and reproduced the
+historical scanner before scoring. **None of the three structure-preserving
+nulls restored `p < 0.01` on the primary complete-vector histogram statistic;
+none approached the prespecified ~3-sigma escalation threshold.** N3 is the
+most anomalous primary result at only `1.52 sigma`. Its secondary count statistic
+is `p = 0.03796` (~`1.77 sigma`), also far below discovery significance.
+
+This materially strengthens the interpretation of the original N0 result: the
+collapse of the nominal 8.0522-sigma aggregate is **not unique to freely
+permuting final spin across all masses**. It persists when broad mass
+association, mass plus measurement precision, or a smooth mass-spin relation is
+preserved.
+
+**Current conclusion:** the **8.0522-sigma base-run value remains a real
+descriptive statement about the historical scan-output distribution under an
+independent-uniform reference**. It is not meaningless and should be retained
+as such. However, across the four tested dependence-aware catalog nulls the
+primary complete-vector global significance ranges only from about
+`0.18 sigma` to `1.52 sigma`. Therefore the historical scan aggregate does
+**not currently support a globally calibrated >5-sigma GWTC-4 population
+anomaly**.
+
+This null family is still not a full LVK astrophysical population model. A
+future physically generative null could test source-population structure,
+selection effects, and parameter-estimation uncertainty. Such a model should be
+built for physical fidelity, not selected because it increases sigma.
+
+See [`GWTC4_NULL_SENSITIVITY.md`](GWTC4_NULL_SENSITIVITY.md) for the frozen
+pre-result methodology and
+[`GWTC4_NULL_SENSITIVITY_RESULTS.md`](GWTC4_NULL_SENSITIVITY_RESULTS.md) for the
+recorded outcomes.
+
+Reproduce the primary 1000-catalog N0 calibration:
 
 ```bash
-# Verify restored historical scan implementation
 python scripts/generate_gwtc4_population_null_matrix.py \
   --verify-only \
   --metadata tables/gwtc4_population_null_verify.json
 
-# Generate the 1000-catalog correlated outer null
 python scripts/generate_gwtc4_population_null_matrix.py \
   --outer-n 1000 \
   --seed 20260901 \
@@ -101,7 +126,6 @@ python scripts/generate_gwtc4_population_null_matrix.py \
   --output-observed tables/gwtc4_population_observed_outercal_1000.csv \
   --output-delta tables/gwtc4_population_null_delta_matrix_1000.csv
 
-# Calibrate the complete population statistic
 python scripts/run_gwtc_population_global_null.py \
   --observed tables/gwtc4_population_observed_outercal_1000.csv \
   --p-column outer_global_p \
