@@ -42,7 +42,7 @@ HISTORICAL_EDGES = np.array(
     [0.0, 0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00],
     dtype=float,
 )
-OBSERVED_P_CANDIDATES = ("p_scanmax", "global_p", "p_value", "p")
+OBSERVED_P_CANDIDATES = ("p_scanmax", "scan_null_p", "global_p", "p_value", "p")
 
 HISTORICAL_N = 168
 HISTORICAL_CHI2 = 95.6
