@@ -1,0 +1,74 @@
+{
+  "schema": "GWTC4_POPULATION_NULL_SENSITIVITY_V1",
+  "null_model": "mass_precision_stratified",
+  "null_definition": {
+    "null_type": "final_spin_mass_precision_stratified_permutation",
+    "interpretation": "Permute final_spin_median only within joint mass-quantile and final-spin-uncertainty-quantile cells. Event-specific uncertainty weights remain fixed, so donor and recipient events have broadly similar mass and precision.",
+    "mass_variable": "log_total_mass_source",
+    "mass_column": "log_total_mass_source_median",
+    "precision_column": "final_spin_width_16_84",
+    "mass_strata": {
+      "requested_bins": 4,
+      "realized_bins": 4,
+      "cell_sizes": {
+        "0": 22,
+        "1": 21,
+        "2": 21,
+        "3": 22
+      }
+    },
+    "precision_strata": {
+      "requested_bins": 2,
+      "realized_bins": 2,
+      "cell_sizes": {
+        "0": 43,
+        "1": 43
+      }
+    },
+    "joint_cell_sizes": {
+      "0": 21,
+      "1": 1,
+      "2": 12,
+      "3": 9,
+      "4": 7,
+      "5": 14,
+      "6": 3,
+      "7": 19
+    },
+    "singleton_joint_cells": 1
+  },
+  "event_summary": "outputs_gwtc4_wct_subsets\\gwtc4_subset_event_summary.csv",
+  "observed_manifest": "tables/gwtc4_population_observed.csv",
+  "n_events": 86,
+  "n_finite_final_spin": 86,
+  "n_scans": 168,
+  "n_unique_subsets": 56,
+  "n_dynamic_final_spin_subsets": 7,
+  "k_min": 0.5,
+  "k_max": 80.0,
+  "n_k": 4000,
+  "degree": 2,
+  "min_events": 12,
+  "top_ns": [
+    12,
+    16,
+    20,
+    24,
+    32
+  ],
+  "seed": 20260903,
+  "outer_n": 1000,
+  "observed_reproduction_max_abs_k_error": 7.105427357601002e-15,
+  "observed_reproduction_max_abs_delta_error": 7.431919080147509e-09,
+  "observed_reproduction_pass": true,
+  "observed_outer_p_min": 0.03896103896103896,
+  "observed_outer_p_median": 0.6243756243756243,
+  "observed_outer_p_lt_0p05": 12,
+  "observed_outer_p_lt_0p10": 33,
+  "outer_per_scan_resolution_floor": 0.000999000999000999,
+  "null_row_rank_resolution_floor": 0.001,
+  "output_null_p_matrix": "tables\\gwtc4_population_mass_precision_stratified_1000_null_matrix.csv",
+  "output_null_delta_matrix": "tables\\gwtc4_population_mass_precision_stratified_1000_null_delta_matrix.csv",
+  "output_observed_outercal": "tables\\gwtc4_population_mass_precision_stratified_1000_observed_outercal.csv",
+  "suggested_global_result": "tables\\gwtc4_population_mass_precision_stratified_1000_global_result.json"
+}

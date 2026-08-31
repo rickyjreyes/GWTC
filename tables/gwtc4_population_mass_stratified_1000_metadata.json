@@ -1,0 +1,54 @@
+{
+  "schema": "GWTC4_POPULATION_NULL_SENSITIVITY_V1",
+  "null_model": "mass_stratified",
+  "null_definition": {
+    "null_type": "final_spin_mass_stratified_permutation",
+    "interpretation": "Permute final_spin_median only within quantile strata of a fixed mass coordinate, preserving broad mass-spin association while destroying event-level ordering.",
+    "mass_variable": "log_total_mass_source",
+    "mass_column": "log_total_mass_source_median",
+    "mass_strata": {
+      "requested_bins": 4,
+      "realized_bins": 4,
+      "cell_sizes": {
+        "0": 22,
+        "1": 21,
+        "2": 21,
+        "3": 22
+      }
+    }
+  },
+  "event_summary": "outputs_gwtc4_wct_subsets\\gwtc4_subset_event_summary.csv",
+  "observed_manifest": "tables/gwtc4_population_observed.csv",
+  "n_events": 86,
+  "n_finite_final_spin": 86,
+  "n_scans": 168,
+  "n_unique_subsets": 56,
+  "n_dynamic_final_spin_subsets": 7,
+  "k_min": 0.5,
+  "k_max": 80.0,
+  "n_k": 4000,
+  "degree": 2,
+  "min_events": 12,
+  "top_ns": [
+    12,
+    16,
+    20,
+    24,
+    32
+  ],
+  "seed": 20260902,
+  "outer_n": 1000,
+  "observed_reproduction_max_abs_k_error": 7.105427357601002e-15,
+  "observed_reproduction_max_abs_delta_error": 7.431919080147509e-09,
+  "observed_reproduction_pass": true,
+  "observed_outer_p_min": 0.03696303696303696,
+  "observed_outer_p_median": 0.46403596403596403,
+  "observed_outer_p_lt_0p05": 24,
+  "observed_outer_p_lt_0p10": 30,
+  "outer_per_scan_resolution_floor": 0.000999000999000999,
+  "null_row_rank_resolution_floor": 0.001,
+  "output_null_p_matrix": "tables\\gwtc4_population_mass_stratified_1000_null_matrix.csv",
+  "output_null_delta_matrix": "tables\\gwtc4_population_mass_stratified_1000_null_delta_matrix.csv",
+  "output_observed_outercal": "tables\\gwtc4_population_mass_stratified_1000_observed_outercal.csv",
+  "suggested_global_result": "tables\\gwtc4_population_mass_stratified_1000_global_result.json"
+}
