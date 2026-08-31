@@ -6,53 +6,97 @@ inference.** All results below are reproducible via [REPRODUCE.md](REPRODUCE.md)
 
 ## Historical GWTC-4 population-level aggregate result
 
-A prior GWTC-4 catalog-scan analysis reported a strong departure from uniformity
-across **168 scan-max p-values**. The repository now audits the reported
-arithmetic explicitly:
+The restored historical analysis contains **168 scans = 56 subset selectors x
+3 final-spin pairs**. The original scan table is committed as
+`tables/gwtc4_population_observed.csv`, and the historical scanner is preserved
+as `scripts/gwtc4_wct_subset_scan_compound.py`.
 
-| population statistic | historical report | literal recomputation | nominal one-sided Z |
-|---|---:|---:|---:|
-| distribution nonuniformity | `chi^2 = 95.6`, `p_unif < 1e-15` | `p = 4.12e-16` for `df = 10` | **8.05 sigma** |
-| count at `p < 0.10` | 47 / 168; labeled Poisson-tail `p < 1e-10` | Poisson(`lambda=16.8`) `p = 1.16e-9`; exact Binomial(168,0.10) `p = 4.85e-11` | **5.97 sigma Poisson / 6.47 sigma exact-binomial** |
-| count at `p < 0.05` | 16 / 168; labeled Poisson-tail `p = 1.4e-3` | Poisson(`lambda=8.4`) `p = 0.0125`; exact Binomial(168,0.05) `p = 0.0105` | about **2.24-2.31 sigma** |
+### Nominal historical calculation
 
-The paper text describes "11 equal bins," but its figure and expected counts
-correspond to `[0,.05]`, `[.05,.10]`, then nine width-`.10` bins. The audit uses
-the figure-compatible construction, which gives expected counts 8.4, 8.4, then
-16.8 for `N = 168`.
+Using the actual 168 historical `scan_null_p` values:
 
-The key correction is that the historical `47/168` result **is above 5 sigma
-under both the literal Poisson approximation and the exact binomial marginal
-count test**, but the previously reported label `Poisson p < 1e-10` is not the
-literal Poisson result. The exact binomial tail does satisfy `p < 1e-10`.
-Likewise, the historical `16/168` Poisson-tail value does not reproduce under
-the stated calculation.
+| population statistic | literal recomputation | nominal one-sided Z |
+|---|---:|---:|
+| distribution nonuniformity | `chi^2 = 95.630952`, `p = 4.06578e-16` | **8.0522 sigma** |
+| count at `p < 0.10` | 47 / 168; Poisson `p = 1.16e-9`; exact Binomial `p = 4.85e-11` | **5.97 sigma Poisson / 6.47 sigma exact-binomial** |
+| count at `p < 0.05` | 16 / 168; Poisson `p = 0.0125`; exact Binomial `p = 0.0105` | about **2.24-2.31 sigma** |
 
-These remain **aggregate population statistics**, not individual-event or
-single-subset significances. More importantly, all of the analytic/count
-significances above assume a reference distribution that does not fully account
-for dependence among the partially overlapping catalog scans. They should
-therefore **not** be presented as a globally calibrated `8.05 sigma` WCT
-detection.
+The historical paper text describes "11 equal bins," but its figure and expected
+counts correspond to `[0,.05]`, `[.05,.10]`, then nine width-`.10` bins. The
+audit uses that figure-compatible construction.
 
-The repository includes `scripts/run_gwtc_population_global_null.py`, which:
+These numbers are **nominal marginal/independence-based diagnostics**. The 168
+scans reuse the same 86 events across heavily overlapping ranking and quantile
+subsets, so treating the full p-vector as independent uniform draws is not an
+adequate global null.
 
-1. audits the historical reported numbers with `--audit-reported`;
-2. recomputes the aggregate statistic from the actual observed 168-value
-   p-vector when supplied; and
-3. calibrates the final statistic against complete null-catalog 168-scan vectors
-   when an end-to-end null matrix is supplied.
+### Restored-scan verification
 
-The exact historical 168-value scan vector and selector manifest are not
-currently committed in this repository, so the arithmetic audit is reproducible
-now but a complete reconstruction of the historical scan ensemble remains open.
-See [REPRODUCE.md](REPRODUCE.md) for the commands and input format.
+Before generating any population nulls, the recovered implementation was forced
+to reproduce all historical scan maxima from the saved event summary:
 
-A definitive global-significance statement requires a catalog-level null
-ensemble that reproduces the complete selection, ranking, scan, and aggregation
-workflow and directly calibrates the final population statistic under the null.
-The historical aggregate result is therefore reported here for completeness but
-is **not used to assign the current repository verdict** below.
+| verification quantity | result |
+|---|---:|
+| events | 86 |
+| observed scans | 168 |
+| unique subsets | 56 |
+| scan pairs | 3 |
+| dynamic final-spin subsets | 7 |
+| max `|k_recalc-k_saved|` | `7.10543e-15` |
+| max `|Delta_recalc-Delta_saved|` | `7.43192e-09` |
+| reproduction | **PASS** |
+
+This closes the earlier reconstruction gap: the historical selector/scanner
+architecture is now reproducible from the restored files.
+
+### Correlation-aware catalog-level outer null
+
+`scripts/generate_gwtc4_population_null_matrix.py` generates whole-catalog outer
+nulls by permuting finite `final_spin_median` values across event labels while
+keeping event identity, non-final-spin variables, missingness, and the historical
+weighting/selector architecture fixed. Each outer catalog is passed through the
+same 168 scan definitions.
+
+For the first **200 outer catalogs**:
+
+- fixed-membership scans: 147;
+- dynamic-selector scans rebuilt per permutation: 21;
+- per-scan Monte Carlo floor: `1/201 = 0.0049751244`;
+- observed outer-calibrated count `p < 0.05`: 43;
+- observed outer-calibrated count `p < 0.10`: 52.
+
+The outer-calibrated observed p-vector itself has
+`chi^2 = 164.61905` and an analytic independent-uniform conversion of
+`p = 3.6006e-30` (`11.3526 sigma`). **That analytic conversion is not a valid
+global significance**, because these rank-calibrated p-values are both discrete
+and strongly dependent.
+
+The valid comparison is against the complete correlated null-catalog
+population statistics:
+
+| end-to-end statistic | empirical result |
+|---|---:|
+| histogram chi-square global p | **0.094527363** |
+| histogram chi-square global Z | **1.31338 sigma** |
+| count-below-0.10 global p | **0.054726368** |
+| outer catalogs | 200 |
+| MC resolution floor | 0.0049751244 |
+
+**Result:** under the stated final-spin event-label permutation null, the
+historical GWTC-4 population anomaly is **not globally significant**. The
+nominal 8.0522-sigma historical value collapses to an empirical
+**1.31-sigma catalog-level result** after selector/event-overlap dependence is
+included.
+
+Therefore this repository contains **no globally calibrated >5-sigma GWTC-4
+population result**. The old >5-sigma values are retained only to document the
+historical marginal calculation and the size of the dependence correction.
+
+This permutation null is not a complete LVK astrophysical population model; it
+tests a specific exchangeability null for final spin under the recovered
+selector architecture. Additional astrophysical/measurement-aware nulls are
+useful robustness checks, but the current correlated result already invalidates
+the earlier independent-uniform >5-sigma interpretation.
 
 ## Catalog source and event counts
 
