@@ -18,6 +18,28 @@ variables.
 > able to return **PASS, PARTIAL, FAIL, or INCOMPLETE**, and negative /
 > negative-control results are retained as valuable.
 
+## GWTC-4 population-level aggregate result
+
+An earlier GWTC-4 catalog-scan analysis reported a strong **population-level
+nonuniformity of scan-max p-values across 168 catalog scans**:
+
+| aggregate statistic | reported result | nominal one-sided Gaussian equivalent |
+|---|---:|---:|
+| p-value distribution nonuniformity | `chi^2 = 95.6`, `p_unif < 1e-15` | **`Z > 7.94 sigma`** |
+| excess scans with `p < 0.10` | 47 / 168 observed vs 16.8 expected, Poisson-tail `p < 1e-10` | **`Z > 6.36 sigma`** |
+
+These sigma values are **nominal p-to-Z conversions of aggregate statistics**.
+They are not single-event significances, do not establish WCT attribution, and
+should not be described as a particle-physics-style WCT discovery threshold.
+The 168 scan statistics are partially overlapping/correlated; a definitive
+global-significance claim requires an **end-to-end catalog-level null ensemble**
+that reruns the identical selection, ranking, scanning, and aggregation pipeline
+and calibrates the final population statistic directly.
+
+This historical aggregate result is intentionally kept separate from the
+current stricter diagnostic verdict in [RESULTS.md](RESULTS.md). The current
+harness verdict remains **PARTIAL — Reliability Class III**.
+
 ## Core hypothesis
 
 If WCT-style curvature/winding structure appears in gravitational-wave
