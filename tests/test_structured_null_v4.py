@@ -111,7 +111,7 @@ def test_structured_density_integrates_to_one() -> None:
     params = synthetic_params()
     grid = np.geomspace(params.z_min, params.z_max, 5000)
     density = observed_density_on_grid(grid, params)
-    integral = np.trapz(density, grid)
+    integral = np.trapezoid(density, grid)
     assert np.all(np.isfinite(density))
     assert np.all(density >= 0.0)
     assert abs(integral - 1.0) < 2e-5
