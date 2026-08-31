@@ -10,6 +10,7 @@ from run_gwtc_population_global_null import (  # noqa: E402
     aggregate_summary,
     empirical_upper_tail,
     histogram_chi2,
+    historical_report_audit,
     validate_pvalues,
 )
 
@@ -37,7 +38,7 @@ def test_uniform_midpoints_have_zero_histogram_chi2():
     assert np.isclose(stat, 0.0)
 
 
-def test_aggregate_summary_counts_thresholds():
+def test_aggregate_summary_counts_thresholds_and_tail_methods():
     p = np.concatenate(
         [
             np.full(16, 0.01),
@@ -49,7 +50,24 @@ def test_aggregate_summary_counts_thresholds():
     assert summary["n_scans"] == 168
     assert summary["count_p_lt_0p05"] == 16
     assert summary["count_p_lt_0p10"] == 47
-    assert summary["poisson_tail_p_lt_0p10"] < 1e-10
+
+    tail10 = summary["threshold_0p10"]
+    assert tail10["poisson_upper_tail_p"] > 1e-10
+    assert np.isclose(tail10["poisson_upper_tail_p"], 1.1624470921913866e-9)
+    assert tail10["exact_binomial_upper_tail_p"] < 1e-10
+    assert np.isclose(tail10["exact_binomial_upper_tail_p"], 4.8514971358661826e-11)
+
+
+def test_historical_report_audit_exposes_arithmetic_mismatch():
+    audit = historical_report_audit()
+    assert audit["recomputed_chi2_p"] < 1e-15
+    assert audit["recomputed_chi2_one_sided_z"] > 8.0
+
+    c05 = audit["count_p_lt_0p05"]
+    c10 = audit["count_p_lt_0p10"]
+    assert c05["reported_value_matches_literal_poisson"] is False
+    assert c10["literal_poisson_satisfies_reported_bound"] is False
+    assert c10["exact_binomial_satisfies_reported_bound"] is True
 
 
 def test_empirical_tail_uses_plus_one_correction():
