@@ -20,6 +20,13 @@ conversions of the reported analytic p-values. Because the catalog scans are
 partially overlapping/correlated, these values should **not** be presented as a
 globally calibrated `>7.9 sigma` WCT detection.
 
+The repository now includes
+`scripts/run_gwtc_population_global_null.py`, which computes the historical
+population statistic from the observed 168 p-values and, when given an
+end-to-end null-catalog matrix, calibrates the aggregate statistic while
+preserving the empirical dependence among scans. See [REPRODUCE.md](REPRODUCE.md)
+for the command and required input formats.
+
 A definitive global-significance statement requires a catalog-level null
 ensemble that reproduces the complete selection, ranking, scan, and aggregation
 workflow and directly calibrates the final population statistic under the null.
