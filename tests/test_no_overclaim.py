@@ -42,14 +42,19 @@ def test_readme_states_does_not_replace_lvk():
 # Forbidden unqualified overclaim phrases (case-insensitive substring match).
 # The guard scans harness docs and scripts but NOT this test file (which must
 # contain the phrases in order to check for them) and NOT legacy root scripts.
+#
+# Important: do not forbid a generic word such as "proof". Bounded statements
+# such as "this is not a proof" are scientifically useful and must remain
+# legal. The guard targets affirmative overclaims instead.
 # ---------------------------------------------------------------------------
 FORBIDDEN = [
     "gwtc proves wct",
     "gravitational waves prove wct",
     "new physics discovered",
     "lvk missed wct",
-    "confirmed",
-    "proof",
+    "confirmed wct",
+    "proof of wct",
+    "proof that wct",
 ]
 
 SCANNED_DOCS = [
@@ -73,8 +78,14 @@ def test_no_forbidden_overclaim_phrases(path):
 
 def test_allowed_bounded_language_present_somewhere():
     blob = " ".join(_read(d).lower() for d in SCANNED_DOCS)
+
+    # The title currently reads "WCT-Motivated GWTC Log-Domain Residual
+    # Diagnostic". Require both ideas without making punctuation or the
+    # inserted GWTC descriptor part of the scientific contract.
+    assert "wct-motivated" in blob
+    assert "diagnostic" in blob
+
     for allowed in [
-        "wct-motivated diagnostic",
         "candidate log-domain residual",
         "scale-like variable",
         "negative control",
