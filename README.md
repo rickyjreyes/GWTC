@@ -9,14 +9,44 @@ variables.
 > - It **does not prove WCT**.
 > - It **does not replace LVK population-inference analyses**.
 > - It **does not claim a new gravitational-wave detection**.
-> - It only tests whether selected catalog-scale variables contain stable
->   log-domain residual modes after null testing and stress checks.
+> - It tests whether selected catalog-scale variables contain reproducible,
+>   predictive, or otherwise nontrivial log-domain residual structure under
+>   increasingly strict null models and holdout protocols.
 >
-> This is a **WCT-motivated diagnostic** only. A negative result does not
-> disprove WCT, and a positive result is a **candidate log-domain residual**
-> that **requires independent confirmation**. The harness is designed to be
-> able to return **PASS, PARTIAL, FAIL, or INCOMPLETE**, and negative /
-> negative-control results are retained as valuable.
+> A null result does not by itself prove that the underlying catalog is
+> structureless, and a positive result does not by itself identify the physical
+> mechanism. The repository separates **descriptive structure**, **predictive
+> holdout evidence**, and **source-attribution / null discrimination**.
+
+## Current evidence hierarchy
+
+The repository now contains several distinct GWTC tests that should not be
+collapsed into a single sigma value.
+
+| layer | question | current result | interpretation |
+|---|---|---|---|
+| Historical GWTC-4 aggregate | Are the 168 historical scan outputs unusually nonuniform under an independent-uniform reference? | nominal `8.0522 sigma` | **Yes descriptively**, but the 168 scans are strongly dependent. |
+| GWTC-4 dependence-aware outer nulls | Is that same 168-scan p-vector rare after preserving selector/catalog dependence? | empirical global `0.18–1.52 sigma` across N0–N3 | The historical aggregate is **not globally calibrated >5 sigma** under these nulls. This does not prove the structure is nonphysical. |
+| Strict frozen holdout V1 | Does a training-frozen chirp-mass mode predict the declared holdout? | `p = 0.00129987`, `PASS_FIXED_MODE` | **Positive fixed-mode holdout evidence.** |
+| Unbinned KDE V3 | Does the frozen mode survive removal of histogram binning and replacement of the polynomial baseline by a training-only Gaussian KDE? | `Delta 2logL = 10.0122`, `8/10000` exceedances, `p = 0.00089991`, `PASS_ROBUSTNESS_FIXED_MODE` | **Positive unbinned fixed-mode robustness evidence.** GWTC-5 had already been inspected in V2, so this is robustness rather than a new independent catalog replication. |
+| Structured astrophysical-null V4 | Can a training-fitted **non-periodic** broken-power-law + Gaussian-peak population with predeclared selection weighting reproduce the exact frozen `k = 9.7`, amplitude, and phase statistic? | **FROZEN; evaluation pending** | This is the current source-discrimination challenge. The null deliberately preserves broad population structure without inserting a periodic term. |
+
+The strict holdout result is committed in
+`tables/gwtc_frozen_holdout_result.csv`. The V3 result is committed in
+`tables/gwtc_v3_unbinned_kde_holdout_result.csv`. The V4 frozen definition is
+committed in `tables/gwtc_v4_frozen_structured_null.json`; see
+[V4_REPRODUCE.md](V4_REPRODUCE.md) for the one-shot evaluation protocol.
+
+The key interpretive distinction is:
+
+> **Failure to distinguish an observed statistic from a structure-preserving
+> null is not equivalent to proving that the null's physical mechanism caused
+> the observation.** It means that statistic is not diagnostic between the
+> observed catalog and that declared null family.
+
+Conversely, a V4 pass would show that the exact frozen phase/amplitude/frequency
+mode is uncommon under the declared non-periodic structured population family;
+it would not by itself establish WCT or fully model LVK selection effects.
 
 ## GWTC-4 population-level aggregate result
 
@@ -63,7 +93,7 @@ The 1000-catalog rank-calibrated observed p-vector itself gives a nominal
 independent-uniform `Z = 11.4562 sigma`, but that conversion is **not a valid
 global significance** because those p-values are discrete and strongly
 dependent. The complete-vector empirical comparison is the scientifically
-relevant result.
+relevant calibration for that specific aggregate statistic.
 
 ### Prespecified null-sensitivity study
 
@@ -80,31 +110,29 @@ model changed.
 | N3 smooth mass-spin residual permutation | smooth degree-2 broad mass-spin relation | `0.063936` | `1.523 sigma` | `0.037962` |
 
 All alternative runs used 1000 complete outer catalogs and reproduced the
-historical scanner before scoring. **None of the three structure-preserving
-nulls restored `p < 0.01` on the primary complete-vector histogram statistic;
-none approached the prespecified ~3-sigma escalation threshold.** N3 is the
-most anomalous primary result at only `1.52 sigma`. Its secondary count statistic
-is `p = 0.03796` (~`1.77 sigma`), also far below discovery significance.
+historical scanner before scoring. None of the three structure-preserving
+nulls produced `p < 0.01` on the primary complete-vector histogram statistic.
+N3 is the most anomalous primary result at `1.52 sigma`; its secondary count
+statistic is `p = 0.03796` (~`1.77 sigma`).
 
-This materially strengthens the interpretation of the original N0 result: the
-collapse of the nominal 8.0522-sigma aggregate is **not unique to freely
-permuting final spin across all masses**. It persists when broad mass
-association, mass plus measurement precision, or a smooth mass-spin relation is
-preserved.
+These results establish a limitation of the **historical aggregate statistic**:
+its nominal 8.0522-sigma independent-uniform conversion is not a calibrated
+catalog-level significance once the dependence architecture is included. They
+do **not** establish that the underlying catalog structure has been causally
+explained by those permutation models. A null that deliberately preserves a
+class of correlations can also preserve structure of physical interest; the
+question is whether the chosen statistic distinguishes the observed catalog
+from that null family.
 
-**Current conclusion:** the **8.0522-sigma base-run value remains a real
-descriptive statement about the historical scan-output distribution under an
-independent-uniform reference**. It is not meaningless and should be retained
-as such. However, across the four tested dependence-aware catalog nulls the
-primary complete-vector global significance ranges only from about
-`0.18 sigma` to `1.52 sigma`. Therefore the historical scan aggregate does
-**not currently support a globally calibrated >5-sigma GWTC-4 population
-anomaly**.
+**Current historical conclusion:** the `8.0522 sigma` base-run value remains a
+real descriptive statement about the historical scan-output distribution under
+an independent-uniform reference. It is not meaningless and is retained. The
+same p-vector histogram statistic, however, does **not currently establish a
+globally calibrated >5-sigma GWTC-4 population anomaly** under N0–N3.
 
-This null family is still not a full LVK astrophysical population model. A
-future physically generative null could test source-population structure,
-selection effects, and parameter-estimation uncertainty. Such a model should be
-built for physical fidelity, not selected because it increases sigma.
+This is why the newer V1/V3/V4 line freezes a specific chirp-mass residual mode
+and tests prediction and source discrimination directly rather than relying on
+the aggregate distribution of 168 marginal p-values.
 
 See [`GWTC4_NULL_SENSITIVITY.md`](GWTC4_NULL_SENSITIVITY.md) for the frozen
 pre-result methodology and
@@ -138,32 +166,38 @@ The exact historical scanner is preserved as
 committed as `tables/gwtc4_population_observed.csv`. See
 [REPRODUCE.md](REPRODUCE.md) for the full procedure and null-model limitations.
 
-This historical aggregate result is intentionally kept separate from the
-current stricter diagnostic verdict in [RESULTS.md](RESULTS.md). The current
-harness verdict remains **PARTIAL — Reliability Class III**.
-
 ## Core hypothesis
 
 If WCT-style curvature/winding structure appears in gravitational-wave
-catalogs, it should appear as **stable residual structure in physically
-scale-like logarithmic variables**, not arbitrary transforms.
+catalogs, it should appear as **stable residual phase organization in physically
+scale-like logarithmic variables**, not merely as arbitrary small p-values.
 
 For a positive, scale-like catalog variable `z` (e.g. source-frame chirp mass),
-define the log coordinate `ell = ln(z)`, bin it into an event-density field,
-fit a smooth Poisson baseline `mu0(ell)`, and test a single log-periodic
-residual mode:
+define the log coordinate `ell = ln(z)`. The basic residual family is
 
-```
-log mu(ell; k, a, b, c) = log mu0(ell) + c + a cos(k ell) + b sin(k ell)
+```text
+A cos(k ell - phi)
 ```
 
-scanning `k` over a declared grid. The active-domain winding number is
-`n_star = k_star * Delta_ell_A / (2*pi)`. Significance is judged by a
-**parametric Poisson-bootstrap global p-value**, never by a local chi^2
-p-value alone.
+or equivalently
 
-See [METHOD.md](METHOD.md) for full definitions and the PASS/PARTIAL/FAIL/
-INCOMPLETE rules, and [RESULTS.md](RESULTS.md) for the current verdict.
+```text
+a cos(k ell) + b sin(k ell).
+```
+
+Exploratory scans may search `k`, but the stronger tests freeze `k`, amplitude,
+phase, baseline definition, and data split before evaluation. The active-domain
+winding number is `n_star = k_star * Delta_ell_A / (2*pi)`.
+
+The current evidence hierarchy therefore prioritizes, in order:
+
+1. independent/frozen prediction;
+2. survival under non-polynomial and unbinned baselines;
+3. survival under structured **non-periodic** population nulls;
+4. only then conversion to stronger physical claims.
+
+See [METHOD.md](METHOD.md), [V3_REPRODUCE.md](V3_REPRODUCE.md), and
+[V4_REPRODUCE.md](V4_REPRODUCE.md) for the current protocols.
 
 ## Data source
 
@@ -202,27 +236,21 @@ python scripts/inspect_catalog_schema.py
 # 3. Build the clean per-event table
 python scripts/build_gwtc_table.py
 
-# 4. Smoke run on ln(M_chirp)
-python scripts/run_gwtc_log_scan.py --variable M_chirp --cumulative \
-    --p-astro-min 0.5 --bins 20 --null-n 100 --k-min 0.5 --k-max 40
-
-# 5. Tests
+# 4. Run tests
 pytest -q
 ```
 
-For the full reproduction sequence (all stress tests, controls, verdict) see
-[REPRODUCE.md](REPRODUCE.md).
+For the historical diagnostic sequence see [REPRODUCE.md](REPRODUCE.md).
+For the stronger frozen fixed-mode sequences see
+[V2_REPRODUCE.md](V2_REPRODUCE.md), [V3_REPRODUCE.md](V3_REPRODUCE.md), and
+[V4_REPRODUCE.md](V4_REPRODUCE.md).
 
 ## Repository layout
 
-```
-scripts/   pipeline (fetch, build, scan, nulls, stress, controls, verdict)
-tables/    canonical CSV outputs (one schema, see METHOD.md)
+```text
+scripts/   historical scanners, frozen holdout evaluators, and structured nulls
+tables/    canonical results, frozen model artifacts, and manifests
 data/      raw catalog payload + provenance manifest
-outputs/   per-k scan curves and the human-readable VERDICT.txt
-tests/     pipeline correctness + overclaim guard
+outputs/   diagnostic scan curves and summaries
+tests/     pipeline correctness, freeze guards, null tests, overclaim guards
 ```
-
-Every result CSV carries the same schema columns: `catalog_version, variable,
-subset, bin_count, k_best, n_star, DeltaD_star, local_p, global_p, null_n,
-verdict_label, notes`.
