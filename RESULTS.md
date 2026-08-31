@@ -46,10 +46,10 @@ to reproduce all historical scan maxima from the saved event summary:
 | max `|Delta_recalc-Delta_saved|` | `7.43192e-09` |
 | reproduction | **PASS** |
 
-This closes the earlier reconstruction gap: the historical selector/scanner
-architecture is reproducible from the restored files.
+The historical selector/scanner architecture is therefore reproducible from the
+restored files to floating-point tolerance.
 
-### Correlation-aware catalog-level outer null
+### N0 — unrestricted event-label permutation
 
 `scripts/generate_gwtc4_population_null_matrix.py` generates whole-catalog outer
 nulls by permuting finite `final_spin_median` values across event labels while
@@ -63,45 +63,77 @@ Two independent-size calibrations were run:
 |---|---:|---:|
 | fixed-membership scans | 147 | 147 |
 | dynamic-selector scans | 21 | 21 |
-| observed outer-calibrated count `p < 0.05` | 43 | **42** |
-| observed outer-calibrated count `p < 0.10` | 52 | **52** |
 | MC floor | 0.004975 | **0.000999** |
 | histogram chi-square global p | 0.094527 | **0.103896** |
 | histogram chi-square global Z | 1.31338 sigma | **1.25966 sigma** |
 | count-below-0.10 global p | 0.054726 | **0.062937** |
 
-The 1000-catalog run used seed `20260901` and is now the primary quoted
-correlation-aware result. Its outer-calibrated observed p-vector has
-`chi^2 = 167.11905` and an analytic independent-uniform conversion of
-`p = 1.09489e-30` (`11.4562 sigma`). **That analytic conversion is not a valid
-global significance**, because these rank-calibrated p-values are discrete and
-strongly dependent.
+The 1000-catalog run used seed `20260901`. Its rank-calibrated observed p-vector
+has an analytic independent-uniform conversion of `11.4562 sigma`, but that is
+not a valid global significance because the p-values are discrete and strongly
+dependent. The complete-vector empirical result is `p = 0.1038961`, or
+`1.25966 sigma`.
 
-The valid complete-vector comparison is therefore:
+### Prespecified null-sensitivity study
 
-\[
-p_{\rm global}=0.1038961,\qquad Z_{\rm global}=1.25966\,\sigma.
-\]
+The unrestricted N0 result raised a legitimate question: does freely permuting
+final spin across all masses destroy physically meaningful broad structure and
+therefore over-correct the nominal 8.05-sigma base result?
 
-The 200- and 1000-catalog results agree closely despite the larger ensemble and
-changed seed. The population anomaly therefore does **not** approach a discovery
-threshold under this stated null; it lies near a 10% global tail probability.
+To test that question without changing the observed statistic, the repo froze a
+null-sensitivity protocol in [`GWTC4_NULL_SENSITIVITY.md`](GWTC4_NULL_SENSITIVITY.md)
+before running three more models. The historical 168 scans, selectors, k-grid,
+baseline degree, and observed scan-max statistics remained unchanged.
 
-**Result:** under the final-spin event-label permutation null, the historical
-GWTC-4 population anomaly is **not globally significant**. The nominal
-8.0522-sigma historical value is reduced to an empirical **1.26-sigma
-catalog-level result** after selector/event-overlap dependence is included.
+All sensitivity runs used **1000 complete outer catalogs**, and all first
+reproduced the historical scan implementation with the same floating-point
+errors above. The test suite passed **15/15** before execution.
 
-Therefore this repository contains **no globally calibrated >5-sigma GWTC-4
-population result**. The old >5-sigma values are retained only to document the
-historical marginal calculation and demonstrate the size of the dependence
-correction.
+| null | structure preserved | observed rank-p histogram `chi^2` | nominal analytic Z* | **empirical global p** | **empirical global Z** | count `p<0.10` global p |
+|---|---|---:|---:|---:|---:|---:|
+| N0 full event-label | non-spin catalog quantities + selector dependence | 167.119 | 11.456 sigma | **0.103896** | **1.260 sigma** | 0.062937 |
+| N1 mass-stratified | broad total-mass association | 79.857 | 7.121 sigma | **0.344655** | **0.400 sigma** | 0.171828 |
+| N2 mass+precision stratified | broad total-mass + final-spin precision association | 67.417 | 6.310 sigma | **0.428571** | **0.180 sigma** | 0.128871 |
+| N3 smooth mass-spin residual | smooth degree-2 broad mass-spin relation | 181.583 | 12.040 sigma | **0.063936** | **1.523 sigma** | 0.037962 |
 
-This permutation null is not a complete LVK astrophysical population model; it
-tests a specific exchangeability null for final spin under the recovered
-selector architecture. Additional astrophysical/measurement-aware nulls are
-useful robustness checks, but increasing the number of permutations of this
-same null is not expected to change the qualitative conclusion.
+\*The nominal analytic Z values in this table are **diagnostic only** and are
+not valid global significances for the dependent rank-calibrated vectors.
+
+The primary empirical complete-vector result is nonsignificant in **all four
+null models**. N1 and N2 are substantially *less* anomalous than N0. N3 is the
+most favorable structure-preserving null for an anomaly, but still gives only
+`p = 0.063936` (`1.52255 sigma`) on the primary population statistic. Its
+secondary count-below-0.10 statistic gives `p = 0.037962` (~`1.77 sigma`), far
+from the prespecified ~3-sigma escalation threshold and not an independent
+replication.
+
+No structure-preserving null produced primary `p < 0.01`, and none approached
+`p < 0.0027` (~3 sigma). Thus the reduction of the nominal 8.0522-sigma base
+aggregate is **not an artifact unique to unrestricted final-spin exchangeability**.
+It persists when broad mass association, broad mass plus measurement precision,
+and a smooth mass-spin relation are deliberately preserved.
+
+Full numerical outcomes and the prespecified interpretation are recorded in
+[`GWTC4_NULL_SENSITIVITY_RESULTS.md`](GWTC4_NULL_SENSITIVITY_RESULTS.md).
+
+### Historical GWTC-4 conclusion
+
+The **8.0522-sigma historical result remains a real descriptive property of the
+base scan ensemble under an independent-uniform reference**. It is useful and
+should not be described as meaningless. However, it does not survive as a
+catalog-level physical anomaly when the complete dependent scan architecture is
+calibrated.
+
+Across the four tested dependence-aware nulls, the primary global significance
+ranges from approximately **0.18 sigma to 1.52 sigma**. Therefore this repository
+contains **no globally calibrated >5-sigma GWTC-4 population result** from the
+historical 168-scan aggregate.
+
+This conclusion does not prove that GWTC contains no physical structure. The
+next materially different test would be a generative astrophysical population
+null incorporating source-population structure, selection effects, and
+parameter-estimation uncertainty. Such a model should be motivated by physical
+fidelity rather than by whether it increases sigma.
 
 ## Catalog source and event counts
 
