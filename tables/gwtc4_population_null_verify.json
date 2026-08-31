@@ -1,0 +1,42 @@
+{
+  "schema": "GWTC4_POPULATION_OUTER_NULL_V1",
+  "null_type": "final_spin_event_label_permutation",
+  "interpretation": "Permute finite final_spin_median values across event labels while holding event-specific uncertainty weights and all non-final-spin catalog quantities fixed; rebuild all historical selectors.",
+  "event_summary": "outputs_gwtc4_wct_subsets\\gwtc4_subset_event_summary.csv",
+  "observed_manifest": "tables\\gwtc4_population_observed.csv",
+  "n_events": 86,
+  "n_scans": 168,
+  "n_unique_subsets": 56,
+  "n_dynamic_final_spin_subsets": 7,
+  "pairs": [
+    [
+      "log_chirp_mass_source",
+      "final_spin"
+    ],
+    [
+      "log_final_mass_source",
+      "final_spin"
+    ],
+    [
+      "log_total_mass_source",
+      "final_spin"
+    ]
+  ],
+  "k_min": 0.5,
+  "k_max": 80.0,
+  "n_k": 4000,
+  "degree": 2,
+  "min_events": 12,
+  "top_ns": [
+    12,
+    16,
+    20,
+    24,
+    32
+  ],
+  "seed": 20260831,
+  "outer_n": 0,
+  "observed_reproduction_max_abs_k_error": 7.105427357601002e-15,
+  "observed_reproduction_max_abs_delta_error": 7.431919080147509e-09,
+  "observed_reproduction_pass": true
+}
