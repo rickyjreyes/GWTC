@@ -89,16 +89,18 @@ bash run_all.sh    # convenience wrapper for steps 5-8 (see repo root)
 
 ## 10. Historical GWTC-4 168-scan population audit and calibration
 
-### 10.1 Audit the reported aggregate arithmetic
+The recovered historical run contains exactly **168 scans = 56 subset
+selectors x 3 final-spin pairs**. The original 168-row scan result table is
+committed as `tables/gwtc4_population_observed.csv`, and the historical scanner
+is preserved as `scripts/gwtc4_wct_subset_scan_compound.py`.
 
-This command requires no historical p-value file. It checks the reported
-`N=168`, `chi^2=95.6`, 16 scans below `0.05`, and 47 scans below `0.10`:
+### 10.1 Audit the reported aggregate arithmetic
 
 ```bash
 python scripts/run_gwtc_population_global_null.py --audit-reported
 ```
 
-The current audit should report approximately:
+The arithmetic audit reports approximately:
 
 ```text
 chi2 = 95.6, df = 10
@@ -106,7 +108,7 @@ analytic chi2 p = 4.12e-16
 nominal one-sided Z = 8.05 sigma
 
 47 / 168 below 0.10:
-  Poisson(lambda=16.8) upper tail = 1.16e-9   (~5.97 sigma)
+  Poisson(lambda=16.8) upper tail = 1.16e-9      (~5.97 sigma)
   exact Binomial(168,0.10) upper tail = 4.85e-11 (~6.47 sigma)
 
 16 / 168 below 0.05:
@@ -114,79 +116,134 @@ nominal one-sided Z = 8.05 sigma
   exact Binomial(168,0.05) upper tail = 0.0105
 ```
 
-This exposes two historical labeling/arithmetic issues: the reported
-`47/168` value labeled as a Poisson tail `<1e-10` is not the literal Poisson
-result, although the exact binomial tail is `<1e-10`; and the reported
-`16/168` Poisson-tail `1.4e-3` is not reproduced by the stated Poisson or exact
-binomial calculation.
+The historical `47/168` value was labeled as a Poisson tail `<1e-10`; literal
+Poisson arithmetic gives `1.16e-9`, whereas the exact binomial tail is
+`4.85e-11`. The historical `16/168` Poisson-tail value is also not reproduced
+by the stated Poisson model. These arithmetic-label corrections do not alter
+the observed 168-vector itself.
 
-The paper text also says "11 equal bins," but its figure and expected counts
-correspond to edges
-`[0,.05,.10,.20,.30,.40,.50,.60,.70,.80,.90,1.0]`. The audit uses these
+The paper text also says "11 equal bins," but its figure and reported expected
+counts correspond to edges
+`[0,.05,.10,.20,.30,.40,.50,.60,.70,.80,.90,1.0]`. The audit uses those
 figure-compatible edges.
 
-### 10.2 Recompute from the actual observed 168 p-values
-
-If the historical observed vector is restored or regenerated:
+### 10.2 Recompute the actual historical 168-vector
 
 ```bash
 python scripts/run_gwtc_population_global_null.py \
   --observed tables/gwtc4_population_observed.csv \
+  --p-column scan_null_p \
   --output tables/gwtc4_population_global_result.json
 ```
 
-Required observed format:
+The recovered vector gives:
 
-- exactly 168 rows;
-- one p-value column named `p_scanmax`, `global_p`, `p_value`, or `p`, or select
-  the column explicitly with `--p-column`.
+```text
+Observed scans        = 168
+chi2                   = 95.630952
+analytic uniformity p = 4.06578e-16
+nominal one-sided Z   = 8.0522 sigma
+count p < 0.05        = 16
+count p < 0.10        = 47
+```
 
-The exact historical 168-value vector and its selector manifest are **not
-currently committed**, so this stage cannot yet reconstruct the published
-histogram from repository data alone.
+This verifies the nominal 8.05-sigma aggregate directly from the original scan
+results. It is still not a correlation-corrected global significance.
 
-### 10.3 Actual correlated catalog-level global-null test
+### 10.3 Verify the restored selector/scanner implementation
 
-For the global test that matters scientifically, supply a matrix created by
-rerunning the **identical 168-scan workflow on complete null catalogs**:
+The outer-null generator first recomputes all 168 historical scan-max
+statistics from the recovered event summary and aborts unless the saved
+`k_best` and `Delta-chi2` values are reproduced to tight numerical tolerance.
+
+```bash
+python scripts/generate_gwtc4_population_null_matrix.py --verify-only
+```
+
+This requires the recovered historical event-summary file:
+
+```text
+outputs_gwtc4_wct_subsets/gwtc4_subset_event_summary.csv
+```
+
+### 10.4 Generate the dependence-preserving catalog-level null
+
+The implemented outer null permutes finite `final_spin_median` values across
+event labels while keeping each event's uncertainty weight and all non-final-
+spin quantities fixed. The **same 56 subset rules and 3 final-spin pairs are
+rebuilt for every null catalog**, including selectors that explicitly rank or
+threshold on final spin.
+
+This is a correlation-aware event-label permutation null. It is not a full LVK
+astrophysical population model, so any surviving significance should be stated
+with that null model named explicitly.
+
+Start with a validation ensemble:
+
+```bash
+python scripts/generate_gwtc4_population_null_matrix.py \
+  --outer-n 200 \
+  --output-matrix tables/gwtc4_population_null_matrix.csv \
+  --output-observed tables/gwtc4_population_observed_outercal.csv
+```
+
+The generator writes:
+
+- `tables/gwtc4_population_null_matrix.csv` — one correlated 168-p-value vector
+  per outer-null catalog;
+- `tables/gwtc4_population_observed_outercal.csv` — the observed 168 scan-max
+  statistics recalibrated against the same outer-null ensemble;
+- `tables/gwtc4_population_null_delta_matrix.csv` — raw scan-max Delta-chi2
+  values for every null catalog;
+- `tables/gwtc4_population_null_metadata.json` — null definition, settings,
+  reproduction errors and resolution floors.
+
+The per-scan outer p-values are rank calibrated, rather than obtained by
+nesting hundreds of inner null scans inside every outer catalog. This keeps the
+historical selector dependence while making the global calibration tractable.
+
+### 10.5 Compute the correlation-aware population significance
+
+Use the outer-calibrated observed vector, not the historical independently
+calibrated `scan_null_p` column:
 
 ```bash
 python scripts/run_gwtc_population_global_null.py \
-  --observed tables/gwtc4_population_observed.csv \
+  --observed tables/gwtc4_population_observed_outercal.csv \
+  --p-column outer_global_p \
   --null-matrix tables/gwtc4_population_null_matrix.csv \
   --output tables/gwtc4_population_global_result.json
 ```
 
-Required null format:
+That final command compares the observed aggregate statistic with the aggregate
+statistics of complete null-catalog 168-vectors. The reported empirical p-value
+therefore includes the overlap/correlation induced by the historical selector
+architecture under the stated final-spin event-label permutation null.
 
-- one complete null catalog per row;
-- exactly 168 p-value columns in the same scan-definition order as the observed
-  vector;
-- metadata columns may be present if they are nonnumeric;
-- alternatively prefix scan columns (for example `scan_000` ... `scan_167`)
-  and pass `--null-prefix scan_`.
+**Do not construct the null matrix from 168 independent Uniform(0,1) draws.**
+That would erase the selector dependence and return to the independence-based
+analytic approximation.
 
-**Do not use 168 independent Uniform(0,1) draws per row as the null matrix.**
-That erases the overlap/correlation among ranking and subset selectors and only
-reproduces an independence-based analytic reference, not the actual global
-null of the analysis workflow.
-
-The empirical Monte Carlo p-value uses the plus-one correction
+The catalog-level empirical p-value uses the plus-one correction
 `(1 + N_ge) / (1 + N_null_catalogs)`. Directly resolving a one-sided 5-sigma
-p-value with zero exceedances therefore requires roughly **3.49 million** null
-catalogs. A smaller ensemble is still useful for testing whether the nominal
-8-sigma-scale statistic collapses once scan dependence is included.
+p-value with zero exceedances requires roughly **3.49 million complete outer
+null catalogs**. Smaller ensembles still measure whether the nominal 8.05-sigma
+aggregate collapses substantially once selector dependence is included.
 
 ## Outputs
 
-- `tables/gwtc_*.csv` — canonical results (one schema; see METHOD.md §6).
-- `outputs/summary/VERDICT.txt` — human-readable verdict.
+- `tables/gwtc_*.csv` — canonical current-harness results (see METHOD.md §6).
+- `outputs/summary/VERDICT.txt` — current diagnostic verdict.
 - `outputs/summary/scan_*.csv`, `outputs/summary/*.png` — scan curves / plots.
-- `tables/gwtc4_population_global_result.json` — arithmetic audit and, when
-  supplied, observed-vector and empirical catalog-level population calibration.
+- `tables/gwtc4_population_observed.csv` — restored historical 168-scan results.
+- `tables/gwtc4_population_global_result.json` — nominal and/or correlated
+  population calibration result.
+- `tables/gwtc4_population_null_matrix.csv` — correlated outer-null p vectors.
+- `tables/gwtc4_population_null_delta_matrix.csv` — corresponding raw scan-max
+  Delta-chi2 vectors.
 
 ## Seeds
 
 Default seeds are explicit: primary/stress `--seed 12345`, controls
-`--seed 2024`. Change them to test stability; the verdict should not hinge on a
-single seed.
+`--seed 2024`, historical outer population null `--seed 20260831`. Change them
+to test stability; a strong result should not hinge on one random seed.
