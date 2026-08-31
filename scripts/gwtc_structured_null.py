@@ -68,8 +68,6 @@ def broken_powerlaw_unnormalized(
     x = np.asarray(z, dtype=float)
     if break_z <= 0.0 or not np.isfinite(break_z):
         raise ValueError("break_z must be positive and finite")
-    # Scale by the break before exponentiation.  This both enforces continuity
-    # and avoids unnecessary large powers for physical mass values.
     ratio = np.clip(x / break_z, 1e-300, None)
     return np.where(x <= break_z, ratio ** alpha_low, ratio ** alpha_high)
 
@@ -89,7 +87,7 @@ def selection_weight(
 ) -> np.ndarray:
     """Relative monotone efficiency used for the V4 sensitivity scenarios.
 
-    For gamma=0 there is no selection weighting.  gamma=2.5 corresponds to
+    For gamma=0 there is no selection weighting. gamma=2.5 corresponds to
     the familiar low-redshift inspiral-volume scaling M_chirp^(5/2), used only
     as an approximate stress test rather than an exact detector model.
     """
@@ -116,8 +114,8 @@ def observed_density_on_grid(
     )
     peak = truncated_gaussian_unnormalized(x, params.peak_mu, params.peak_sigma)
 
-    power_norm = float(np.trapz(power, x))
-    peak_norm = float(np.trapz(peak, x))
+    power_norm = float(np.trapezoid(power, x))
+    peak_norm = float(np.trapezoid(peak, x))
     if power_norm <= 0.0 or peak_norm <= 0.0:
         raise RuntimeError("failed to normalize intrinsic components")
     power = power / power_norm
@@ -128,7 +126,7 @@ def observed_density_on_grid(
         raise ValueError("peak_fraction must lie in [0,1]")
     intrinsic = (1.0 - frac) * power + frac * peak
     selected = intrinsic * selection_weight(x, params.z_max, params.selection_gamma)
-    norm = float(np.trapz(selected, x))
+    norm = float(np.trapezoid(selected, x))
     if not np.isfinite(norm) or norm <= 0.0:
         raise RuntimeError("failed to normalize selected structured null")
     return selected / norm
@@ -178,8 +176,6 @@ def fit_structured_null(
     if selection_gamma < 0.0 or not np.isfinite(selection_gamma):
         raise ValueError("selection_gamma must be finite and non-negative")
 
-    # Freeze support to the observed training span.  A tiny numerical margin
-    # avoids assigning zero density to endpoint observations.
     lo_data = float(np.min(data))
     hi_data = float(np.max(data))
     eps = 1e-8 * (hi_data - lo_data)
@@ -194,10 +190,10 @@ def fit_structured_null(
     sigma_hi = 0.50 * span
 
     bounds = [
-        (-8.0, 4.0),       # alpha_low
-        (-10.0, 4.0),      # alpha_high
+        (-8.0, 4.0),
+        (-10.0, 4.0),
         (break_lo, break_hi),
-        (0.0, 0.75),       # Gaussian peak fraction
+        (0.0, 0.75),
         (z_min, z_max),
         (sigma_lo, sigma_hi),
     ]
@@ -289,7 +285,6 @@ def structured_fixed_statistic_null(
     if n_events <= 0:
         raise ValueError("n_events must be positive")
 
-    # Local import avoids making this utility dependent on catalog code.
     from gwtc_unbinned_kde import fixed_log_likelihood_ratio
 
     rng = np.random.default_rng(int(seed))
