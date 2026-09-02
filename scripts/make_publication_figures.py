@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 mpl.rcParams["svg.hashsalt"] = "gwtc-publication-figures-v1"
+mpl.rcParams["svg.fonttype"] = "none"
 
 ROOT = Path(__file__).resolve().parents[1]
 TABLES = ROOT / "tables"
@@ -96,8 +97,9 @@ def make_v2_frozen_model(out: Path, formats: list[str]) -> None:
 def make_v3_frequency_scan(out: Path, formats: list[str]) -> None:
     v3 = _load_json("gwtc_v3_frozen_unbinned_kde_mode.json")
     scan = pd.DataFrame(v3["scan"])
+    zoom = scan[(scan["k"] >= 7.5) & (scan["k"] <= 12.5)].copy()
     fig, ax = plt.subplots(figsize=(7.2, 4.5))
-    ax.plot(scan["k"], scan["train_delta_2logl"])
+    ax.plot(zoom["k"], zoom["train_delta_2logl"], marker="o")
     ax.axvspan(9.5, 10.0, alpha=0.15, label="Prospective band 9.5-10.0")
     ax.axvline(9.7, linestyle="--", label="Prospective k = 9.7")
     ax.scatter(
@@ -109,7 +111,7 @@ def make_v3_frequency_scan(out: Path, formats: list[str]) -> None:
     )
     ax.set_xlabel("log-frequency k")
     ax.set_ylabel(r"training $\Delta 2\log L$")
-    ax.set_title("V3 training-only frequency scan")
+    ax.set_title("V3 training-only frequency scan near the frozen mode")
     ax.legend(frameon=False, fontsize=9)
     fig.tight_layout()
     _save(fig, out / "publication_v3_frequency_scan", formats)
