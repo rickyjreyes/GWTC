@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="572.4pt" height="147.456pt" viewBox="0 0 572.4 147.456" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 147.456 
+L 572.4 147.456 
+L 572.4 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="text_1">
+    <g id="patch_2">
+     <path d="M 9.421953 84.550969 
+L 71.938047 84.550969 
+Q 77.438047 84.550969 77.438047 79.050969 
+L 77.438047 68.405031 
+Q 77.438047 62.905031 71.938047 62.905031 
+L 9.421953 62.905031 
+Q 3.921953 62.905031 3.921953 68.405031 
+L 3.921953 79.050969 
+Q 3.921953 84.550969 9.421953 84.550969 
+z
+" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle" x="40.68" y="76.763313" transform="rotate(-0 40.68 76.763313)">Freeze split</text>
+   </g>
+   <g id="text_2">
+    <g id="patch_3">
+     <path d="M 106.615469 90.709766 
+L 209.104531 90.709766 
+Q 214.604531 90.709766 214.604531 85.209766 
+L 214.604531 62.246234 
+Q 214.604531 56.746234 209.104531 56.746234 
+L 106.615469 56.746234 
+Q 101.115469 56.746234 101.115469 62.246234 
+L 101.115469 85.209766 
+Q 101.115469 90.709766 106.615469 90.709766 
+z
+" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(106.615469 70.604516)">Select background</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(118.879609 82.922109)">(training only)</text>
+   </g>
+   <g id="text_3">
+    <g id="patch_4">
+     <path d="M 222.766875 90.709766 
+L 338.473125 90.709766 
+Q 343.973125 90.709766 343.973125 85.209766 
+L 343.973125 62.246234 
+Q 343.973125 56.746234 338.473125 56.746234 
+L 222.766875 56.746234 
+Q 217.266875 56.746234 217.266875 62.246234 
+L 217.266875 85.209766 
+Q 217.266875 90.709766 222.766875 90.709766 
+z
+" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(222.766875 70.604516)">Select residual mode</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(241.639609 82.922109)">(training only)</text>
+   </g>
+   <g id="text_4">
+    <g id="patch_5">
+     <path d="M 360.984375 84.550969 
+L 434.615625 84.550969 
+Q 440.115625 84.550969 440.115625 79.050969 
+L 440.115625 68.405031 
+Q 440.115625 62.905031 434.615625 62.905031 
+L 360.984375 62.905031 
+Q 355.484375 62.905031 355.484375 68.405031 
+L 355.484375 79.050969 
+Q 355.484375 84.550969 360.984375 84.550969 
+z
+" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle" x="397.8" y="76.763313" transform="rotate(-0 397.8 76.763313)">Freeze model</text>
+   </g>
+   <g id="text_5">
+    <g id="patch_6">
+     <path d="M 461.566328 90.709766 
+L 557.233672 90.709766 
+Q 562.733672 90.709766 562.733672 85.209766 
+L 562.733672 62.246234 
+Q 562.733672 56.746234 557.233672 56.746234 
+L 461.566328 56.746234 
+Q 456.066328 56.746234 456.066328 62.246234 
+L 456.066328 85.209766 
+Q 456.066328 90.709766 461.566328 90.709766 
+z
+" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(461.566328 70.604516)">Evaluate GWTC-5</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif" transform="translate(473.515078 82.922109)">holdout once</text>
+   </g>
+   <g id="patch_7">
+    <path d="M 78.952588 73.728 
+Q 99.270678 73.728 118.470735 73.728 
+" style="fill: none; stroke: #000000; stroke-linecap: round"/>
+    <path d="M 114.470735 71.728 
+L 118.470735 73.728 
+L 114.470735 75.728 
+" style="fill: none; stroke: #000000; stroke-linecap: round"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 196.131566 73.728 
+Q 219.241628 73.728 241.233656 73.728 
+" style="fill: none; stroke: #000000; stroke-linecap: round"/>
+    <path d="M 237.233656 71.728 
+L 241.233656 73.728 
+L 237.233656 75.728 
+" style="fill: none; stroke: #000000; stroke-linecap: round"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 318.892588 73.728 
+Q 339.210678 73.728 358.410735 73.728 
+" style="fill: none; stroke: #000000; stroke-linecap: round"/>
+    <path d="M 354.410735 71.728 
+L 358.410735 73.728 
+L 354.410735 75.728 
+" style="fill: none; stroke: #000000; stroke-linecap: round"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 436.06782 73.728 
+Q 453.596801 73.728 470.007749 73.728 
+" style="fill: none; stroke: #000000; stroke-linecap: round"/>
+    <path d="M 466.007749 71.728 
+L 470.007749 73.728 
+L 466.007749 75.728 
+" style="fill: none; stroke: #000000; stroke-linecap: round"/>
+   </g>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle" x="286.2" y="21.707605" transform="rotate(-0 286.2 21.707605)">Strict frozen holdout protocol</text>
+   </g>
+  </g>
+ </g>
+</svg>
