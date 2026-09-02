@@ -21,6 +21,30 @@ This repository tests **WCT-style log-domain residual structure** in LIGO-Virgo-
 | Unbinned KDE V3 | `Delta 2logL = 10.0122`, `8/10000`, `p = 0.00089991`, `PASS_ROBUSTNESS_FIXED_MODE` | The frozen mode survives removal of histogram binning and replacement of the polynomial baseline by a training-only KDE. |
 | Structured non-periodic population-null V4 | **`PASS_ALL_STRUCTURED_NULLS`**; worst-case `p = 0.00559944` | The exact frozen `k = 9.7`, amplitude and phase statistic is uncommon under all three declared non-periodic structured-population scenarios. |
 
+## Publication figures
+
+The publication-facing figure set is now kept in [`figures/publication/`](figures/publication/README.md) and is generated from the committed frozen V2/V3/V4 artifacts rather than from the historical exploratory scan.
+
+Regenerate the full SVG + PNG set with:
+
+```bash
+python scripts/make_publication_figures.py
+```
+
+### Frozen-mode evidence hierarchy
+
+![Frozen-mode evidence summary](figures/publication/publication_evidence_summary.svg)
+
+### V3 training-only frequency localization
+
+![V3 training frequency scan](figures/publication/publication_v3_frequency_scan.svg)
+
+### V4 structured non-periodic null challenge
+
+![V4 structured null challenge](figures/publication/publication_v4_structured_nulls.svg)
+
+The figure directory also contains the strict holdout protocol, the V2 frozen model, and the V2/V3 cross-method frequency comparison. The historical `figures/scan_M_chirp_B30.png` remains preserved as exploratory/historical material and should not be used as the primary visual evidence for the strict `k ~ 9.7` program.
+
 ## V4 result
 
 V4 was frozen before evaluation. The evaluator could not scan `k`, refit the residual coefficients, refit the structured population, or change the predeclared selection scenarios on the holdout.
@@ -98,6 +122,8 @@ Key files:
 - `V3_REPRODUCE.md` — unbinned KDE fixed-mode robustness
 - `V4_REPRODUCE.md` — frozen structured-population-null challenge
 - `GWTC_V4_STRUCTURED_NULL_RESULT.md` — V4 result record
+- `figures/publication/README.md` — publication figure index and paper placement guide
+- `scripts/make_publication_figures.py` — regenerate publication SVG/PNG/PDF figures from committed artifacts
 - `TODO.md` — remaining tests
 
 Run the test suite with:
