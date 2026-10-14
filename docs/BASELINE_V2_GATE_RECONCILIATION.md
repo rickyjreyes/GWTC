@@ -1,0 +1,26 @@
+# Baseline-v2 original acceptance reconciliation (#3)
+
+This is an audit against the ORIGINAL issue acceptance criteria, not a rewrite
+of thresholds after seeing later data.
+
+| Original criterion | Evidence in main/this branch | Current disposition |
+|---|---|---|
+| CV on canonical M_chirp **training** | `scripts/run_baseline_v2_cv.py`, committed `tables/gwtc_baseline_v2_cv.csv`, strict training-only PR #5 | Implemented/committed |
+| Non-polynomial smooth baseline chosen on training-only predictive fit | V3 KDE LOO bandwidth selection; `tables/gwtc_v3_frozen_unbinned_kde_mode.json` | Implemented/committed |
+| Unbinned cross-check | V3 unbinned evaluator and original V3 result | Implemented/committed |
+| Freeze holdout manifest before residual inspection | V1 manifest and frozen model paths; see V2/V3 reproduction records | Implemented for declared V1 protocol, with caveat earlier pre-strict CV saw the holdout |
+| Evaluate training-selected mode on holdout WITHOUT rescanning k | V1 strict fixed model and holdout result `p=0.0012998700` | Implemented/committed |
+| Propagate posterior/measurement uncertainty | #11 per-event provenance-verified posterior sensitivity tool added in this PR; original official HDF5 data not downloaded or run | **OPEN: scientific evidence missing** |
+| Preserve PARTIAL/Class III unless *every* promotion gate passes | README/RESULTS/METHOD historical interpretation and tests/test_no_overclaim.py | Keep existing classification; do NOT infer Class I from V1/V3/V4 |
+| Record negative outcomes unchanged | historical N0–N3 artifacts, V1–V4 results retained | Implemented and must remain |
+
+The V4 structured population null (worst-case p=0.00559944) adds useful
+source-discrimination robustness, but still uses simplified selection weights.
+It does **not** substitute for #8 full PE/injection-calibrated hierarchical
+inference or #9 genuinely unseen catalog. Do not close #3 until the original
+measurement uncertainty gate is executed and verified; report a negative
+posterior result as negative if obtained.
+
+Source data note: GWTC-5.0 PE stable release version 9 is available in official
+Zenodo parts 1 and 2. Retrieval, checksums and exact waveform/product choice
+must be documented rather than guessed.

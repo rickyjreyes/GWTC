@@ -16,7 +16,7 @@ a separate execution and provenance review.
 | #14 | Predeclared V1/V3/V4 multi-seed/depth runner and exact-binomial uncertainty | Prepared; long numerical matrix not yet run |
 | #13 | Official HDF5 observable presence audit, never substitute unofficial estimates | Metadata gate only; official field/units audit and secondary analysis pending |
 | #10 | Frozen historical coherence statistic and optional full k/phase/n/selector-membership export from complete outer-null generator, tests | Recovered historical event summary and 1,000-catalog null replay still pending |
-| #3 | V1/V3/V4 existing artifacts retained | Reconcile original acceptance criteria after #11 and #8 data runs |
+| #3 | Original acceptance checklist reconciled with V1/V3/V4; no changed criteria | Official posterior uncertainty run still pending; preserve Class III |
 
 No GitHub issues should be closed merely because this PR is merged. Preserve
 original outcome labels, including negative/null results. Particularly V3 and
