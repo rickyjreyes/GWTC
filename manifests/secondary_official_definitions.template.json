@@ -1,0 +1,25 @@
+{
+  "schema": "GWTC_SECONDARY_OFFICIAL_DEFINITIONS_V1",
+  "observables": [
+    {
+      "observable": "E_rad",
+      "exact_field": "REPLACE_WITH_EXACT_OFFICIAL_FIELD",
+      "official_definition_url": "REQUIRED_OFFICIAL_RELEASE_URL",
+      "release_id": "REQUIRED_RELEASE_ID",
+      "definition_sha256": "REQUIRED_SOURCE_DOCUMENT_SHA",
+      "units": "REQUIRED_OFFICIAL_UNITS",
+      "frame_convention": "REQUIRED_OFFICIAL_FRAME_DEFINITION",
+      "independent_definition_reviewed": false
+    },
+    {
+      "observable": "peak_luminosity",
+      "exact_field": "peak_luminosity",
+      "official_definition_url": "REQUIRED_OFFICIAL_RELEASE_URL",
+      "release_id": "REQUIRED_RELEASE_ID",
+      "definition_sha256": "REQUIRED_SOURCE_DOCUMENT_SHA",
+      "units": "REQUIRED_OFFICIAL_UNITS",
+      "frame_convention": "REQUIRED_OFFICIAL_FRAME_DEFINITION",
+      "independent_definition_reviewed": false
+    }
+  ]
+}
