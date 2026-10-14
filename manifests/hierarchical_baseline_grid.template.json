@@ -1,0 +1,15 @@
+{
+  "schema": "GWTC_HIERARCHICAL_BASELINE_GRID_V1",
+  "weights_frozen_under_no_mode_model_before_test": false,
+  "posterior_weight_derivation": "REQUIRED: H0-only full-parameter population posterior, not chosen using periodic results",
+  "population_prior_provenance": "REQUIRED: exact hyperprior and hyperparameter samples/grid",
+  "injection_selection_consistency": "REQUIRED: compatible PE priors, recovered-injection campaigns and exposure normalization per Lambda",
+  "models": [
+    {
+      "model_id": "H0_SAMPLE_000",
+      "result_path": "LOCAL_NUMERICAL_RESULT.json",
+      "sha256": "FULL_FILE_SHA256",
+      "baseline_posterior_weight": 1.0
+    }
+  ]
+}
