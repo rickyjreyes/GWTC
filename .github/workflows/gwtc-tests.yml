@@ -1,7 +1,7 @@
 name: GWTC correctness
 on:
   push:
-    branches: ["agent/gwtc-issues-implementation-20261014"]
+    branches: ["main", "agent/gwtc-remaining-issues-*"]
   pull_request:
     paths:
       - "scripts/**"
