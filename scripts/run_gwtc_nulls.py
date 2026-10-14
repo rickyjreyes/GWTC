@@ -60,7 +60,9 @@ def main(argv=None) -> int:
         return 0
 
     field = L.build_density_field(values, bin_count=args.bins)
-    k_grid = L.make_k_grid(args.k_min, args.k_max, args.n_k)
+    declared_grid = L.make_k_grid(args.k_min, args.k_max, args.n_k)
+    k_grid = L.resolved_k_grid(field, declared_grid)
+    print(f"[nulls] Nyquist={L.nyquist_k(field):.6g}; excluded={len(declared_grid) - len(k_grid)} aliased scan frequencies")
     scan = L.scan_k(field, k_grid, baseline_degree=args.baseline_degree)
     null = L.run_poisson_null(
         field, k_grid, scan.delta_d_star, null_n=args.null_n,

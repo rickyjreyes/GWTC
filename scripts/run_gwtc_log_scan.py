@@ -75,7 +75,8 @@ def main(argv=None) -> int:
     # Also write the per-k curve when there were enough events.
     if np.isfinite(row["DeltaD_star"]):
         field = L.build_density_field(values, bin_count=args.bins)
-        scan = L.scan_k(field, k_grid, baseline_degree=args.baseline_degree)
+        resolved_grid = L.resolved_k_grid(field, k_grid)
+        scan = L.scan_k(field, resolved_grid, baseline_degree=args.baseline_degree)
         os.makedirs(args.curve_dir, exist_ok=True)
         curve_path = os.path.join(
             args.curve_dir, f"scan_{args.variable}_{subset_label}_B{args.bins}.csv")
@@ -83,6 +84,8 @@ def main(argv=None) -> int:
             "k": scan.k_grid,
             "DeltaD": scan.delta_d,
             "n": scan.k_grid * field.delta_ell_active / (2 * np.pi),
+            "nyquist_k": L.nyquist_k(field),
+            "resolved": True,
         }).to_csv(curve_path, index=False)
         print(f"[scan] wrote curve {curve_path}")
 
