@@ -80,15 +80,19 @@ def main():
                 and (same.y_var.to_numpy()==obs.y_var.to_numpy()).all()):
             raise SystemExit("Null changed frozen scan-pair identity")
         scores.append(coherence_statistic(group,cfg)["score"])
-    if len(scores)<2:raise SystemExit("Insufficient outer-null catalogs")
+    if null.replicate.isna().any() or not pd.api.types.is_integer_dtype(null.replicate):
+        raise SystemExit("Outer replicate IDs must be integers")
+    if sorted(null.replicate.unique().tolist()) != list(range(len(scores))):
+        raise SystemExit("Outer replicate IDs must be contiguous 0..N-1")
+    if len(scores)<cfg["min_outer_catalogs"]:
+        raise SystemExit("Below frozen minimum whole-catalog outer-null depth")
     n_ge=int(np.sum(np.asarray(scores)>=obs_score["score"]))
     pval=float((1+n_ge)/(1+len(scores)))
     result={"schema":"GWTC4_HISTORICAL_COHERENCE_RESULT_V1",
       "observed_sha256":sha(args.observed),"null_details_sha256":sha(args.null_details),
       "config_sha256":sha(args.config),"observed":obs_score,
       "outer_catalogs":len(scores),"outer_exceed":n_ge,"global_p":pval,
-      "verdict":"PARTIAL_OUTER_MC_DEPTH" if len(scores)<1000 else
-                ("GLOBALLY_RARE_UNDER_THIS_DECLARED_NULL" if pval<.01 else "NOT_GLOBALLY_RARE"),
+      "verdict":"GLOBALLY_RARE_UNDER_THIS_DECLARED_NULL" if pval<cfg["p_threshold_for_exploratory_escalation"] else "NOT_GLOBALLY_RARE",
       "interpretation":"Exploratory historical recurrence under stated complete-catalog outer-null; not an independent frozen GWTC future prediction."}
     if args.output.exists():raise SystemExit("Refusing result overwrite")
     args.output.parent.mkdir(parents=True,exist_ok=True)
