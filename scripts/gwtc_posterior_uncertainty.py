@@ -59,6 +59,16 @@ def extract(file_path, dataset_path, expected_sha256, weight_path=""):
     weights /= weights.sum()
     return np.log(z), weights, source
 
+def weighted_quantile(values, weights, q):
+    """Descriptive weighted quantile, not a PE-prior reweighting."""
+    x=np.asarray(values,float);w=np.asarray(weights,float)
+    if x.shape!=w.shape or x.ndim!=1 or not len(x) or not 0<=q<=1:
+        raise ValueError("Invalid weighted quantile arguments")
+    if not np.isfinite(x).all() or not np.isfinite(w).all() or np.any(w<0) or w.sum()<=0:
+        raise ValueError("Invalid weighted quantile values/weights")
+    idx=np.argsort(x);x=x[idx];w=w[idx]/w.sum()
+    return float(x[np.searchsorted(np.cumsum(w),q,side="left")])
+
 def draw_statistic(events, k, a, b, Z, n_draws, seed):
     """Independent one-draw-per-event replicate; vectorized event-wise weights."""
     if Z <= 0 or n_draws <= 0: raise ValueError("Invalid normalizer/draw count")
@@ -78,6 +88,8 @@ def main():
     p.add_argument("--table", default="tables/gwtc_events_clean.csv", type=Path)
     p.add_argument("--holdout-manifest", default="tables/gwtc_holdout_manifest.csv", type=Path)
     p.add_argument("--draws", type=int, default=10000)
+    p.add_argument("--require-complete", action="store_true", help="Fail closed unless all finite-positive holdout events have PE products")
+    p.add_argument("--event-table-output", type=Path, default=None, help="Optional per-event paired diagnostic CSV, never overwrite")
     p.add_argument("--seed", type=int, default=20261014)
     p.add_argument("--output", default="tables/gwtc_posterior_uncertainty_diagnostic.json", type=Path)
     args = p.parse_args()
@@ -107,6 +119,8 @@ def main():
     expected_positive=set(point.index.astype(str))
     if not input_names.issubset(expected_positive):
         raise SystemExit("Posterior input contains events without finite positive point-estimate counterpart")
+    if args.require_complete and input_names != expected_positive:
+        raise SystemExit("Incomplete official posterior event coverage; missing: "+str(sorted(expected_positive-input_names)))
     mode=freeze["fixed_mode"]; k=float(mode["k"]); a=float(mode["a_cos"]); b=float(mode["b_sin"]); Z=float(mode["normalizer_Z"])
     events=[]; rows=[]
     for row in manifest.itertuples(index=False):
@@ -114,11 +128,17 @@ def main():
         ell, w, source = extract(row.path,row.dataset_path,row.sha256,row.weight_path)
         events.append((ell,w))
         ess=float(1.0/np.sum(w*w))
+        point_ell=float(np.log(float(point.loc[row.event_name])))
+        point_score=float(2*(a*np.cos(k*point_ell)+b*np.sin(k*point_ell)-np.log(Z)))
+        posterior_mean_score=float(2*np.sum(w*(a*np.cos(k*ell)+b*np.sin(k*ell)-np.log(Z))))
         rows.append({"event_name":row.event_name,"path":row.path,"sha256":row.sha256,
           "dataset_path":row.dataset_path,"weight_path":row.weight_path,"source_url":row.source_url,
           "source_frame_field":source,"posterior_n":len(ell),"weight_ess":ess,
-          "posterior_chirp_median":float(np.quantile(np.exp(ell),.5)),
-          "point_chirp":float(point.loc[row.event_name])})
+          "posterior_chirp_median":weighted_quantile(np.exp(ell),w,.5),
+          "point_chirp":float(point.loc[row.event_name]),
+          "point_score_contribution":point_score,
+          "posterior_mean_score_contribution":posterior_mean_score,
+          "posterior_minus_point_contribution":posterior_mean_score-point_score})
     scores=draw_statistic(events,k,a,b,Z,args.draws,args.seed)
     ell_point=np.log(point.loc[manifest.event_name.astype(str)].to_numpy(float))
     t_point=float(2*np.sum(a*np.cos(k*ell_point)+b*np.sin(k*ell_point)-np.log(Z)))
@@ -131,15 +151,21 @@ def main():
          "missing_event_names":sorted(expected_positive-input_names),
          "coverage":"COMPLETE" if input_names==expected_positive else "INCOMPLETE",
          "point_statistic_on_matched_events":t_point,
+         "posterior_mean_minus_point_statistic":float(scores.mean()-t_point),
+         "interpretation_gate":"DESCRIPTIVE_COMPLETE_COVERAGE_ONLY" if input_names==expected_positive else "INCOMPLETE_COVERAGE_NO_FULL_HOLDOUT_VERDICT",
          "draws":args.draws,"seed":args.seed,
          "posterior_draw_score_mean":float(scores.mean()),
          "posterior_draw_score_quantiles_05_50_95":np.quantile(scores,[.05,.5,.95]).tolist(),
          "posterior_draw_fraction_statistic_positive":float(np.mean(scores>0)),
          "calibrated_p":None,
          "events":rows}
-    if args.output.exists():raise SystemExit("Refusing overwrite; preserve first result and rerun under a new filename")
+    if args.output.exists() or (args.event_table_output and (args.event_table_output.exists() or args.event_table_output.resolve()==args.output.resolve())):
+        raise SystemExit("Refusing overwrite; preserve first diagnostic result")
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(out,indent=2)+"\n")
+    if args.event_table_output:
+        args.event_table_output.parent.mkdir(parents=True,exist_ok=True)
+        pd.DataFrame(rows).to_csv(args.event_table_output,index=False)
     print("Wrote",args.output,"coverage=",out["coverage"],"posterior test is diagnostic, NOT a p-value")
 
 if __name__=="__main__":
