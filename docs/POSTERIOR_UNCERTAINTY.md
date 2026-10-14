@@ -28,3 +28,16 @@ Official sources: GWTC-5.0 PE Part 1
 https://zenodo.org/records/20348005 and Part 2
 https://zenodo.org/records/20348006 ; source/version and checksums must be
 recorded for each event. Do not commit multi-GB PE files.
+
+
+## Complete-coverage and per-event diagnostic outputs
+
+For the actual #11 acceptance run after validating each official event/waveform,
+use `--require-complete --event-table-output results/posterior_event_comparison.csv`
+with a NEW `--output` name. Incomplete manifests fail before HDF5 extraction.
+The CSV reports matched canonical point contribution, independently normalized
+posterior-mean contribution and their difference, weighted chirp-mass median,
+per-event ESS, HDF5 SHA and exact dataset/weight paths. Do not substitute this
+descriptive posterior distribution for event likelihood integration, PE-prior
+reweighting, injection selection or a calibrated p-value. Check source-frame
+field units against the official waveform release independently.
