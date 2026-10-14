@@ -19,3 +19,13 @@ independent future-catalog evidence, full population/selection calibration, or
 a substitute for an LVK cumulative event manifest with exact canonical
 selection/FAR and posterior revisions. Reconcile those differences before
 asserting the original #12 scientific gate completed. Preserve all outputs.
+
+## Separate official cumulative release reconciliation
+
+The archived tagged-row audit is not three official cumulative snapshots. Supply three independent, official cumulative CSVs with SHA, official release URL/date and all canonical primary rows via `manifests/cumulative_releases.template.json`. Run:
+
+```bash
+python scripts/gwtc_cumulative_manifest_audit.py --manifest local/cumulative_releases.json --out-prefix results/official_cumulative_audit
+```
+
+Explicit renames require a source-backed `declared_renames` record; unmatched labels are marked **not listed**, never presumed physically removed. The output is descriptive and hash-locked. The old frozen-V4 vs fixed-V3-KDE reference p-values remain in `results/gwtc_catalog_version_audit_results.json`; they are neither physical population-calibrated nor prospective. Reconcile complete official cumulative field/waveform definitions before #12 scientific closure.
