@@ -184,6 +184,58 @@ def score_prepared_one(prep: PreparedScan, y: np.ndarray) -> Tuple[float, float]
     return float(prep.k_grid[idx]), float(delta[idx])
 
 
+def score_prepared_one_details(prep: PreparedScan, y: np.ndarray) -> dict:
+    """Return the historic scan maximum AND the same harmonic phase convention."""
+    y = np.asarray(y, float)
+    if y.shape != prep.sw.shape:
+        raise ValueError("Incorrect y shape for prepared scan")
+    yw = prep.sw*y
+    u = prep.c_resid.T @ yw
+    v = prep.s_resid.T @ yw
+    numer = prep.cc*u*u - 2*prep.bb*u*v + prep.aa*v*v
+    good=prep.det>1e-14
+    delta=np.zeros_like(prep.det)
+    delta[good]=numer[good]/prep.det[good]
+    delta=np.maximum(delta,0.)
+    idx=int(np.argmax(delta))
+    a = float((prep.cc[idx]*u[idx]-prep.bb[idx]*v[idx])/prep.det[idx]) if good[idx] else 0.
+    b = float((prep.aa[idx]*v[idx]-prep.bb[idx]*u[idx])/prep.det[idx]) if good[idx] else 0.
+    k=float(prep.k_grid[idx])
+    span=float(np.max(prep.x)-np.min(prep.x))
+    return {"k_best":k,"delta_chi2":float(delta[idx]),
+            "phase":float(math.atan2(-b,a)), "delta_x":span,
+            "n_obs":k*span/(2*math.pi),"events":",".join(prep.events)}
+
+
+def score_prepared_many_details(prep: PreparedScan, y_matrix: np.ndarray, batch_size: int = 128) -> np.ndarray:
+    """Vectorized peak k, delta, phase, n for complete fixed-selector outer nulls."""
+    ym=np.asarray(y_matrix,float)
+    if ym.ndim!=2 or ym.shape[1]!=len(prep.events):
+        raise ValueError("Wrong outer-null y_matrix shape")
+    result=np.empty((len(ym),4),float)
+    good=prep.det>1e-14
+    span=float(np.max(prep.x)-np.min(prep.x))
+    for start in range(0,len(ym),batch_size):
+        stop=min(len(ym),start+batch_size)
+        yw=prep.sw[:,None]*ym[start:stop].T
+        u=prep.c_resid.T@yw;v=prep.s_resid.T@yw
+        numerator=prep.cc[:,None]*u*u-2*prep.bb[:,None]*u*v+prep.aa[:,None]*v*v
+        delta=np.zeros_like(numerator)
+        delta[good,:]=numerator[good,:]/prep.det[good,None]
+        delta=np.maximum(delta,0.)
+        inds=np.argmax(delta,axis=0)
+        jj=np.arange(stop-start)
+        g=good[inds]; denom=np.where(g,prep.det[inds],1.)
+        a=np.where(g,(prep.cc[inds]*u[inds,jj]-prep.bb[inds]*v[inds,jj])/denom,0.)
+        b=np.where(g,(prep.aa[inds]*v[inds,jj]-prep.bb[inds]*u[inds,jj])/denom,0.)
+        k=prep.k_grid[inds]
+        result[start:stop,0]=k
+        result[start:stop,1]=delta[inds,jj]
+        result[start:stop,2]=np.arctan2(-b,a)
+        result[start:stop,3]=k*span/(2*math.pi)
+    return result
+
+
 def score_prepared_many(prep: PreparedScan, y_matrix: np.ndarray, batch_size: int = 256) -> np.ndarray:
     """Score many y-vectors sharing the same x, weights and event membership."""
     y_matrix = np.asarray(y_matrix, dtype=float)
@@ -286,6 +338,7 @@ def main() -> None:
     ap.add_argument("--top-ns", default="12,16,20,24,32")
     ap.add_argument("--batch-size", type=int, default=128)
     ap.add_argument("--verify-only", action="store_true")
+    ap.add_argument("--output-coherence", default=None, help="Optional FULL outer-null peak k/phase/n/event-membership CSV for #10")
     ap.add_argument(
         "--output-matrix", default="tables/gwtc4_population_null_matrix.csv"
     )
@@ -427,6 +480,7 @@ def main() -> None:
     event_names = event_df["event"].astype(str).tolist()
     event_index = {e: i for i, e in enumerate(event_names)}
     null_delta = np.empty((args.outer_n, len(observed)), dtype=float)
+    coherence_rows = []
 
     fixed_indices = [i for i, row in observed.iterrows() if not is_dynamic_subset(str(row["subset"]))]
     dynamic_indices = [i for i, row in observed.iterrows() if is_dynamic_subset(str(row["subset"]))]
@@ -442,7 +496,17 @@ def main() -> None:
         prep = prepared_fixed[i]
         cols = [event_index[e] for e in prep.events]
         y_many = y_perm[:, cols]
-        null_delta[:, i] = score_prepared_many(prep, y_many, batch_size=args.batch_size)
+        if args.output_coherence:
+            details=score_prepared_many_details(prep,y_many,batch_size=args.batch_size)
+            null_delta[:,i]=details[:,1]
+            row=observed.iloc[i]
+            for outer_i,d in enumerate(details):
+                coherence_rows.append({"replicate":outer_i,"scan_id":row["scan_id"],
+                    "x_var":row["x_var"],"y_var":row["y_var"],"events":",".join(prep.events),
+                    "k_best":d[0],"phase":d[2],"n_obs":d[3],
+                    "delta_x":float(np.max(prep.x)-np.min(prep.x))})
+        else:
+            null_delta[:, i] = score_prepared_many(prep, y_many, batch_size=args.batch_size)
         if pos % 20 == 0 or pos == len(fixed_indices):
             print(f"[fixed] {pos}/{len(fixed_indices)}")
 
@@ -472,7 +536,14 @@ def main() -> None:
                 args.degree,
             )
             y = y_for_events(y_map, prep.events)
-            _, delta = score_prepared_one(prep, y)
+            if args.output_coherence:
+                d=score_prepared_one_details(prep,y)
+                delta=d["delta_chi2"]
+                coherence_rows.append({"replicate":outer_i,"scan_id":row["scan_id"],
+                    "x_var":row["x_var"],"y_var":row["y_var"],"events":d["events"],
+                    "k_best":d["k_best"],"phase":d["phase"],"n_obs":d["n_obs"],"delta_x":d["delta_x"]})
+            else:
+                _, delta = score_prepared_one(prep, y)
             null_delta[outer_i, i] = delta
 
         if (outer_i + 1) % 25 == 0 or outer_i + 1 == args.outer_n:
@@ -503,6 +574,15 @@ def main() -> None:
     matrix_df.to_csv(matrix_path, index=False)
     delta_df.to_csv(delta_path, index=False)
     observed_outer.to_csv(observed_out_path, index=False)
+
+    if args.output_coherence:
+        if len(coherence_rows)!=args.outer_n*len(observed):
+            raise SystemExit("Incomplete coherence full-catalog outer-null matrix")
+        coh_path=Path(args.output_coherence)
+        coh_path.parent.mkdir(parents=True,exist_ok=True)
+        pd.DataFrame(coherence_rows).sort_values(["replicate","scan_id"]).to_csv(coh_path,index=False)
+        metadata["output_coherence_details"]=str(coh_path)
+        metadata["coherence_details_rows"]=len(coherence_rows)
 
     metadata.update(
         {

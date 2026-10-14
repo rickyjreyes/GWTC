@@ -1,0 +1,92 @@
+{
+  "schema": "GWTC_MC_STABILITY_RESULTS_V1",
+  "frozen_hashes": {
+    "V1": "d9cd1fae26ba3aa49b3bd46addecddd9e1bc882e4f4032cc0d9073da10d90336",
+    "V3": "978fe482d4a00ae5c577adb83fd444721bcd9de83692cba4aced0e2cab39904b",
+    "V4": "694480017262182d8825fc479b3df1a8a87d97955ad9466730031bf7a6ea9585"
+  },
+  "input_hashes": {
+    "plan": "be9ce0a23a2853c427cfa283b72e259c3e902d6908a8e4651a038d7f523c6d28",
+    "table": "2e856c7ff99fc081a02ff3a854f21b2cdab6eb2a1c1a7160071b062d67453ac1",
+    "manifest": "90e3ae250f078396d7676cc2abe6169ca06cd7d7d9cea95aaaf5464a1ec43bf7"
+  },
+  "plan_sha256": "be9ce0a23a2853c427cfa283b72e259c3e902d6908a8e4651a038d7f523c6d28",
+  "status": [
+    {
+      "mode": "V1",
+      "scenario": "fixed_polynomial",
+      "stability_verdict": "NUMERICALLY_STABLE_PASS",
+      "p_min": 0.0004999500049995,
+      "p_max": 0.0012998700129987,
+      "exceedance_counts": [
+        12,
+        32,
+        4,
+        45,
+        7,
+        39
+      ]
+    },
+    {
+      "mode": "V3",
+      "scenario": "fixed_KDE",
+      "stability_verdict": "NUMERICALLY_STABLE_PASS",
+      "p_min": 0.0007999840003199,
+      "p_max": 0.0010998900109989,
+      "exceedance_counts": [
+        8,
+        40,
+        10,
+        39,
+        8,
+        41
+      ]
+    },
+    {
+      "mode": "V4",
+      "scenario": "broken_powerlaw_plus_peak_gamma_0",
+      "stability_verdict": "NUMERICALLY_STABLE_PASS",
+      "p_min": 0.0053598928021439,
+      "p_max": 0.0063993600639936,
+      "exceedance_counts": [
+        55,
+        267,
+        63,
+        272,
+        62,
+        285
+      ]
+    },
+    {
+      "mode": "V4",
+      "scenario": "broken_powerlaw_plus_peak_gamma_1.5",
+      "stability_verdict": "NUMERICALLY_STABLE_PASS",
+      "p_min": 0.0001399972000559,
+      "p_max": 0.0004999500049995,
+      "exceedance_counts": [
+        1,
+        6,
+        4,
+        9,
+        1,
+        7
+      ]
+    },
+    {
+      "mode": "V4",
+      "scenario": "broken_powerlaw_plus_peak_gamma_2.5",
+      "stability_verdict": "NUMERICALLY_STABLE_PASS",
+      "p_min": 9.999000099990002e-05,
+      "p_max": 0.0002999700029997,
+      "exceedance_counts": [
+        2,
+        6,
+        0,
+        4,
+        1,
+        4
+      ]
+    }
+  ],
+  "interpretation": "Seed/depth sensitivity of identical frozen models; never choose best seed; no new independent data."
+}

@@ -1,0 +1,48 @@
+{
+  "schema": "GWTC_VERSION_SENSITIVITY_V1",
+  "table_sha256": "2e856c7ff99fc081a02ff3a854f21b2cdab6eb2a1c1a7160071b062d67453ac1",
+  "v3_sha256": "978fe482d4a00ae5c577adb83fd444721bcd9de83692cba4aced0e2cab39904b",
+  "v4_sha256": "694480017262182d8825fc479b3df1a8a87d97955ad9466730031bf7a6ea9585",
+  "results": [
+    {
+      "version": "GWTC-4.0",
+      "raw_version_entries": 129,
+      "positive_pastro_and_mass_n": 86,
+      "zero_or_missing_mass_after_cut": 43,
+      "statistic_type": "frozen V4 k=9.7 score against V3 training KDE reference",
+      "evidence_status": "DESCRIPTIVE_CROSS_VERSION_SENSITIVITY_NOT_PROSPECTIVE",
+      "p_value_not_population_corrected": true,
+      "statistic_2loglr": 2.1602337300287875,
+      "null_n": 10000,
+      "null_exceed": 494,
+      "reference_baseline_p": 0.0494950504949505
+    },
+    {
+      "version": "GWTC-4.1",
+      "raw_version_entries": 140,
+      "positive_pastro_and_mass_n": 88,
+      "zero_or_missing_mass_after_cut": 52,
+      "statistic_type": "frozen V4 k=9.7 score against V3 training KDE reference",
+      "evidence_status": "DESCRIPTIVE_CROSS_VERSION_SENSITIVITY_NOT_PROSPECTIVE",
+      "p_value_not_population_corrected": true,
+      "statistic_2loglr": 1.4221649662668772,
+      "null_n": 10000,
+      "null_exceed": 586,
+      "reference_baseline_p": 0.058694130586941305
+    },
+    {
+      "version": "GWTC-5.0",
+      "raw_version_entries": 161,
+      "positive_pastro_and_mass_n": 104,
+      "zero_or_missing_mass_after_cut": 57,
+      "statistic_type": "frozen V4 k=9.7 score against V3 training KDE reference",
+      "evidence_status": "DESCRIPTIVE_CROSS_VERSION_SENSITIVITY_NOT_PROSPECTIVE",
+      "p_value_not_population_corrected": true,
+      "statistic_2loglr": 9.950185579607101,
+      "null_n": 10000,
+      "null_exceed": 5,
+      "reference_baseline_p": 0.0005999400059994001
+    }
+  ],
+  "limitation": "These catalog-version entries may be incremental and overlapping; reference KDE calibration is not a cross-version prospective replication or full hierarchical population test."
+}

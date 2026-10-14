@@ -57,7 +57,7 @@ def test_scan_n_star_consistent_with_formula():
     rng = np.random.default_rng(2)
     z = np.exp(rng.uniform(0.0, 3.0, size=300))
     field = L.build_density_field(z, bin_count=25)
-    scan = L.scan_k(field, L.make_k_grid(0.5, 30.0, 40))
+    scan = L.scan_k(field, L.resolved_k_grid(field, L.make_k_grid(0.5, 30.0, 40)))
     assert scan.n_star == pytest.approx(
         scan.k_star * field.delta_ell_active / (2 * math.pi))
 
@@ -150,3 +150,27 @@ def test_script_help_works(name):
                          capture_output=True, text=True, timeout=60)
     assert out.returncode == 0, f"{name} --help failed: {out.stderr}"
     assert "usage" in out.stdout.lower()
+
+
+# Issue #15: a high-k grid must never be reported as a resolved mode.
+def test_per_binning_nyquist_changes_with_bin_count():
+    values = np.exp(np.linspace(0.0, 2.0, 100))
+    a = L.build_density_field(values, bin_count=10)
+    b = L.build_density_field(values, bin_count=20)
+    assert L.nyquist_k(b) == pytest.approx(2 * L.nyquist_k(a))
+    grid = L.make_k_grid(0.5, 45.0, 100)
+    resolved = L.resolved_k_grid(a, grid)
+    assert resolved.max() < L.nyquist_k(a)
+    assert len(resolved) < len(grid)
+    with pytest.raises(ValueError, match="aliased"):
+        L.scan_k(a, grid)
+    scanned = L.scan_k(a, resolved)
+    assert scanned.k_star < L.nyquist_k(a)
+
+
+def test_null_requires_same_resolved_grid():
+    values = np.exp(np.linspace(0.0, 2.0, 100))
+    field = L.build_density_field(values, bin_count=10)
+    grid = L.make_k_grid(0.5, 45.0, 100)
+    with pytest.raises(ValueError, match="aliased"):
+        L.run_poisson_null(field, grid, 1.0, null_n=1)

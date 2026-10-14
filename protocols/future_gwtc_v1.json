@@ -1,0 +1,43 @@
+{
+  "schema": "GWTC_FUTURE_FROZEN_PROTOCOL_V1",
+  "scientific_status": "PREREGISTRATION_ONLY_NO_FUTURE_DATA_EVALUATED",
+  "as_of_utc": "2026-10-14",
+  "eligible_release_rule": "FIRST_OFFICIAL_CUMULATIVE_LVK_GWTC_RELEASE_AFTER_GWTC_5_0",
+  "source": "official GWOSC/GWTC released event catalog only",
+  "new_event_rule": "physical commonName absent from historical GWTC-5.0-era clean table",
+  "historical_table_path": "tables/gwtc_events_clean.csv",
+  "historical_table_sha256": "2e856c7ff99fc081a02ff3a854f21b2cdab6eb2a1c1a7160071b062d67453ac1",
+  "v3_model_path": "tables/gwtc_v3_frozen_unbinned_kde_mode.json",
+  "v3_model_sha256": "978fe482d4a00ae5c577adb83fd444721bcd9de83692cba4aced0e2cab39904b",
+  "v4_mode_path": "tables/gwtc_v4_frozen_structured_null.json",
+  "observable": "M_chirp",
+  "unit": "solar masses",
+  "coordinate": "natural logarithm of source-frame M_chirp in solar masses",
+  "selection": {
+    "canonical_primary_only": true,
+    "p_astro_min_inclusive": 0.5,
+    "mass_finite_positive": true,
+    "deduplicate": "commonName across cumulative versions",
+    "no_subsets_or_tuning": true
+  },
+  "frozen_mode": {
+    "k": 9.7,
+    "a_cos": 0.17539820818119706,
+    "b_sin": 0.34311596388867205,
+    "normalizer_Z": 1.051624662201406
+  },
+  "baseline": "frozen V3 training-only Gaussian KDE with original train_ell and selected_bandwidth, NO REFIT",
+  "null": {
+    "method": "fixed_model_null",
+    "n": 10000,
+    "seed": 20261014,
+    "statistic": "2 sum(a cos(k ell)+b sin(k ell)-log Z)",
+    "global_test": "single pre-registered one-shot future catalog",
+    "p_formula": "(1+N_ge)/(1+N)",
+    "threshold": 0.05,
+    "success_requires_positive_statistic": true
+  },
+  "out_of_training_support": "include all eligible positive finite values; report inside/outside counts",
+  "negative_results": "retain unchanged; do not retrain, rescan, or promote robustness into independent replication",
+  "manifest_lock": "prepare manifest of official release and event identities, hash and commit BEFORE evaluating residuals"
+}

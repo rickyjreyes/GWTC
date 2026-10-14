@@ -240,6 +240,28 @@ def build_density_field(
     )
 
 
+# Binned scans sample a sinusoid at B uniformly spaced log-bin centers.
+# A grid extending beyond pi / bin_width aliases high-k solutions.  The
+# strict V1 fitter already guards this; legacy exploratory paths use this
+# common function so observed and null scans always use exactly the same grid.
+def nyquist_k(field: DensityField) -> float:
+    if field.bin_count < 2 or not np.isfinite(field.delta_ell_active) or field.delta_ell_active <= 0:
+        raise ValueError("Invalid binning/support for Nyquist calculation")
+    return math.pi * field.bin_count / field.delta_ell_active
+
+
+def resolved_k_grid(field: DensityField, k_grid: Sequence[float]) -> np.ndarray:
+    grid = np.asarray(list(k_grid), dtype=float)
+    if grid.ndim != 1 or grid.size == 0 or not np.all(np.isfinite(grid)) or np.any(grid <= 0):
+        raise ValueError("k grid must contain finite positive frequencies")
+    # Exclude the exact Nyquist point, where sampled sine/cosine columns are
+    # degenerate. Preserve original spacing and values; never fabricate points.
+    resolved = grid[grid < nyquist_k(field) * (1 - 1e-10)]
+    if not resolved.size:
+        raise ValueError("No resolved k values below this binning's Nyquist limit")
+    return resolved
+
+
 # ---------------------------------------------------------------------------
 # Baseline + log-periodic scan
 # ---------------------------------------------------------------------------
@@ -298,6 +320,8 @@ def scan_k(
     must never be used on its own to declare PASS.
     """
     k_grid = np.asarray(list(k_grid), dtype=float)
+    if not np.array_equal(k_grid, resolved_k_grid(field, k_grid)):
+        raise ValueError("Scan includes aliased k; call resolved_k_grid(field, grid) first")
     if mu0 is None:
         mu0 = fit_baseline(field, degree=baseline_degree)
     dd = np.array([
@@ -355,6 +379,8 @@ def run_poisson_null(
     rng = np.random.default_rng(seed)
     mu0 = fit_baseline(field, degree=baseline_degree)
     k_grid = np.asarray(list(k_grid), dtype=float)
+    if not np.array_equal(k_grid, resolved_k_grid(field, k_grid)):
+        raise ValueError("Null scan includes aliased k; use the identical resolved observed grid")
     t_null = np.empty(null_n)
     for j in range(null_n):
         y = rng.poisson(mu0).astype(float)
@@ -553,6 +579,10 @@ def analyze_cell(
         )
 
     field = build_density_field(values, bin_count=bin_count)
+    requested_k = np.asarray(list(k_grid), dtype=float)
+    k_grid = resolved_k_grid(field, requested_k)
+    note_parts.append(f"nyquist_k={nyquist_k(field):.12g}")
+    note_parts.append(f"aliased_k_excluded={len(requested_k) - len(k_grid)}")
     mu0 = fit_baseline(field, degree=baseline_degree)
     scan = scan_k(field, k_grid, baseline_degree=baseline_degree, mu0=mu0)
 
