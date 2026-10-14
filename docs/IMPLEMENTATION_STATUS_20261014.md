@@ -15,7 +15,7 @@ a separate execution and provenance review.
 | #8 | Rate-marginalized fixed-mode importance reweighting core with numerical gates | Core only; externally validate p0(theta), PE priors and injection proposals, compute actual likelihood challenge |
 | #14 | Predeclared V1/V3/V4 multi-seed/depth runner and exact-binomial uncertainty | Prepared; long numerical matrix not yet run |
 | #13 | Official HDF5 observable presence audit, never substitute unofficial estimates | Metadata gate only; official field/units audit and secondary analysis pending |
-| #10 | Existing historical null infrastructure remains available | Coherence definition + null replay still pending |
+| #10 | Frozen historical coherence statistic and optional full k/phase/n/selector-membership export from complete outer-null generator, tests | Recovered historical event summary and 1,000-catalog null replay still pending |
 | #3 | V1/V3/V4 existing artifacts retained | Reconcile original acceptance criteria after #11 and #8 data runs |
 
 No GitHub issues should be closed merely because this PR is merged. Preserve

@@ -1,0 +1,14 @@
+{
+  "schema": "GWTC4_HISTORICAL_COHERENCE_FROZEN_V1",
+  "status": "EXPLORATORY_PREDECLARE_BEFORE_NEW_COHERENCE_OUTER_NULL",
+  "min_jaccard": 0.5,
+  "k_tolerance": 0.5,
+  "phase_tolerance_radians": 0.7853981633974483,
+  "scan_pairs": "same x_var/y_var only",
+  "duplicate_handling": "deduplicate same x/y and exact event membership",
+  "n_obs_role": "validated as k times active x width over 2 pi; do not count as independent evidence",
+  "global_statistic": "weighted fraction of coherent distinct overlapping subset pairs",
+  "null": "whole-catalog N0 event-label permutation; rerun full selector and scanner including dynamic final-spin branches; preserve negative results",
+  "min_outer_catalogs": 1000,
+  "p_threshold_for_exploratory_escalation": 0.01
+}
