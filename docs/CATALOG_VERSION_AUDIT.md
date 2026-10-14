@@ -6,10 +6,10 @@ population snapshots. The audit records exact identity overlap, revised fields,
 and **not-listed-in-this-version** instead of calling a missing entry a removed
 physical merger. It never uses a later version to retune k, phase or bandwidth.
 
-\`\`\`bash
+```bash
 python scripts/gwtc_catalog_version_audit.py \
  --out-prefix results/gwtc_catalog_version_audit
-\`\`\`
+```
 
 It evaluates the published V4 mode (k=9.7, coefficients and normalizer fixed)
 against the fixed V3 KDE reference on version-specific rows with p_astro>=.5

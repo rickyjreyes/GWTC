@@ -1,7 +1,7 @@
 # First truly unseen GWTC release — frozen prospective protocol (#9)
 
 The exact published future scientific rule is in
-\`protocols/future_gwtc_v1.json\`. It freezes the *V4* exact k=9.7 amplitude,
+`protocols/future_gwtc_v1.json`. It freezes the *V4* exact k=9.7 amplitude,
 phase and normalizer and the *V3* KDE reference including its original training
 centers and bandwidth. It freezes the first official **cumulative GWTC release
 after GWTC-5.0**, the new-event-only selection, canonical primary rows,
@@ -14,24 +14,24 @@ source-frame masses are included, including outside the training domain
 When an eligible release exists, obtain and archive the complete official
 cumulative table, provenance and date. Run:
 
-\`\`\`bash
+```bash
 python scripts/evaluate_future_gwtc.py prepare \
  --future-table official_cumulative.csv \
  --source-url OFFICIAL_URL --release-id OFFICIAL_ID \
  --published-utc YYYY-MM-DD --manifest results/future_manifest.json
 sha256sum results/future_manifest.json
 git add results/future_manifest.json && git commit -m "Lock future GWTC identities before residual evaluation"
-\`\`\`
+```
 
 Externally timestamp/archive the manifest commit and SHA before residual
 evaluation. Then run exactly once:
 
-\`\`\`bash
+```bash
 python scripts/evaluate_future_gwtc.py evaluate \
  --future-table official_cumulative.csv --manifest results/future_manifest.json \
  --locked-manifest-sha256 ARCHIVED_SHA256 \
  --output results/future_result.json
-\`\`\`
+```
 
 The evaluator refuses changed source tables, selection lists, config, input
 hashes and result overwrite. It cannot prevent someone inspecting results

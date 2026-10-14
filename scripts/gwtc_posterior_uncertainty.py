@@ -104,7 +104,8 @@ def main():
                         (pd.to_numeric(subset.M_chirp, errors="coerce")>0)]
     point = subset.set_index("commonName").M_chirp
     if point.index.duplicated().any(): raise SystemExit("Duplicate canonical primary input")
-    if not input_names.issubset(set(point.index.astype(str))):
+    expected_positive=set(point.index.astype(str))
+    if not input_names.issubset(expected_positive):
         raise SystemExit("Posterior input contains events without finite positive point-estimate counterpart")
     mode=freeze["fixed_mode"]; k=float(mode["k"]); a=float(mode["a_cos"]); b=float(mode["b_sin"]); Z=float(mode["normalizer_Z"])
     events=[]; rows=[]
@@ -125,9 +126,10 @@ def main():
          "scientific_status":"POSTERIOR_DRAW_DIAGNOSTIC_NOT_HIERARCHICAL_NOT_CALIBRATED",
          "frozen_sha256":file_sha(args.frozen),"manifest_sha256":file_sha(args.posterior_manifest),
          "table_sha256":file_sha(args.table),"holdout_manifest_sha256":file_sha(args.holdout_manifest),
-         "holdout_expected":len(expected),"input_events":len(events),
-         "missing_event_names":sorted(expected-input_names),
-         "coverage":"COMPLETE" if input_names==expected else "INCOMPLETE",
+         "holdout_manifest_rows":len(expected),"holdout_expected_positive_mass":len(expected_positive),
+         "input_events":len(events),
+         "missing_event_names":sorted(expected_positive-input_names),
+         "coverage":"COMPLETE" if input_names==expected_positive else "INCOMPLETE",
          "point_statistic_on_matched_events":t_point,
          "draws":args.draws,"seed":args.seed,
          "posterior_draw_score_mean":float(scores.mean()),

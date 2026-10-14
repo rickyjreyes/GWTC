@@ -9,9 +9,9 @@ unknown intrinsic normalization cancels between the per-event integrals and
 selection factor when the same p0(theta|Lambda) is used throughout.
 
 Inputs are **prepared, validated importance ratios**, not raw h5 datasets:
-per-event NPZ \`ell, w0_over_pe_prior\`, where weight is reference PE sample
+per-event NPZ `ell, w0_over_pe_prior`, where weight is reference PE sample
 weight times p0(theta|Lambda)/pi_PE(theta); recovered-injection NPZ
-\`ell_detected, w0_over_injection_proposal_detected\`, where weight incorporates
+`ell_detected, w0_over_injection_proposal_detected`, where weight incorporates
 p0(theta|Lambda)/q_inj(theta), correct campaign mixture and observing exposure.
 The JSON manifest explicitly lists each NPZ original SHA-256, official source,
 population model/hyperparameters, reference priors, proposal/exposure and
