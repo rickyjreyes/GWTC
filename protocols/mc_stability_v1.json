@@ -1,0 +1,45 @@
+{
+  "schema": "GWTC_FROZEN_MC_STABILITY_V1",
+  "status": "PREDECLARED_NUMERICAL_STABILITY_ONLY",
+  "depths": [
+    10000,
+    50000
+  ],
+  "seeds": {
+    "V1": [
+      271828,
+      314159,
+      161803
+    ],
+    "V3": [
+      314159,
+      271828,
+      161803
+    ],
+    "V4": [
+      2718281,
+      3141592,
+      1618033
+    ]
+  },
+  "alpha": 0.05,
+  "confidence": 0.95,
+  "modes": {
+    "V1": {
+      "script": "scripts/evaluate_frozen_gwtc_holdout.py",
+      "frozen_arg": "--model",
+      "frozen_path": "tables/gwtc_frozen_mode.json"
+    },
+    "V3": {
+      "script": "scripts/evaluate_frozen_gwtc_unbinned_kde_holdout.py",
+      "frozen_arg": "--frozen",
+      "frozen_path": "tables/gwtc_v3_frozen_unbinned_kde_mode.json"
+    },
+    "V4": {
+      "script": "scripts/evaluate_gwtc_v4_structured_null.py",
+      "frozen_arg": "--frozen",
+      "frozen_path": "tables/gwtc_v4_frozen_structured_null.json"
+    }
+  },
+  "interpretation": "Repeat the same frozen scientific model with predeclared RNG seeds/depths; never select the lowest p or change the published verdict using a favorable seed"
+}
