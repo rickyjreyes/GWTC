@@ -24,3 +24,16 @@ posterior result as negative if obtained.
 Source data note: GWTC-5.0 PE stable release version 9 is available in official
 Zenodo parts 1 and 2. Retrieval, checksums and exact waveform/product choice
 must be documented rather than guessed.
+
+
+## Machine-readable original acceptance audit
+
+Run `python scripts/gwtc_baseline_v2_acceptance.py --output
+results/baseline_v2_gate.json` to record archived gate SHA values and a
+NOT_RUN measurement-uncertainty gate. After #11 official data execution, pass
+`--posterior-result PATH --posterior-sha256 EXACT_HASH` to check the complete
+coverage, exact V4 freeze and original posterior-diagnostic schema. The output
+always preserves `PARTIAL_CLASS_III_NOT_PROMOTED`; full scientific promotion
+still requires independent provenance/interpretation rather than code status.
+Never confuse a posterior-draw sensitivity diagnostic with full hierarchical
+PE and injection analysis or a genuinely unseen future replication.
