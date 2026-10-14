@@ -1,0 +1,9 @@
+{
+  "schema": "GWTC_CUMULATIVE_MANIFEST_V1",
+  "releases": [
+    {"version":"GWTC-4.0","path":"LOCAL_OFFICIAL_CUMULATIVE_4_0.csv","sha256":"SHA256","source_url":"https://gwosc.org/","published_utc":"OFFICIAL_UTC"},
+    {"version":"GWTC-4.1","path":"LOCAL_OFFICIAL_CUMULATIVE_4_1.csv","sha256":"SHA256","source_url":"https://gwosc.org/","published_utc":"OFFICIAL_UTC"},
+    {"version":"GWTC-5.0","path":"LOCAL_OFFICIAL_CUMULATIVE_5_0.csv","sha256":"SHA256","source_url":"https://gwosc.org/","published_utc":"OFFICIAL_UTC"}
+  ],
+  "declared_renames": []
+}
