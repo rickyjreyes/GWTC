@@ -24,8 +24,10 @@ python scripts/generate_gwtc4_population_null_matrix.py \
  --outer-n 1000 --seed 20260831 \
  --output-matrix results/coh_p.csv --output-observed results/coh_obs.csv \
  --output-delta results/coh_delta.csv --metadata results/coh_metadata.json \
- --output-coherence results/coh_full_peak_details.csv
+ --output-coherence results/coh_full_peak_details.csv \
+ --output-observed-coherence results/coh_observed_details.csv
 python scripts/historical_mode_coherence.py \
+ --observed results/coh_observed_details.csv \
  --null-details results/coh_full_peak_details.csv \
  --output results/coherence_result.json
 ```
@@ -38,3 +40,5 @@ historical exploratory calibration; it does not modify V1–V4 or turn the
 historical nominal 8.0522 sigma into an independent discovery significance.
 The original recovered event-summary input is NOT embedded in the public
 repo and the 1,000-catalog run is not performed as part of this PR.
+
+Both observed and outer-null peak exports must be requested together. Recomputed observed details are verified against the original saved k, Delta, event membership and phase. The frozen outer-null minimum depth and complete contiguous replicate IDs are enforced rather than producing an apparent definitive verdict from a short diagnostic.
