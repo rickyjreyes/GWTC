@@ -1,0 +1,23 @@
+{
+  "schema": "GWTC_HIERARCHICAL_IMPORTANCE_WEIGHTS_V1",
+  "population_model_and_hyperparameters": "REQUIRED: training-frozen model/provenance",
+  "pe_reference_prior_and_reweighting": "REQUIRED: full theta density incl waveform convention",
+  "injection_proposal_campaign_exposure": "REQUIRED: validated total proposal and era exposure",
+  "selection_detection_rule": "REQUIRED: FAR and injected-search thresholds",
+  "official_source": "REQUIRED: release/URL/SHA256",
+  "ess_min_event": 20,
+  "ess_min_injection": 416,
+  "loglr_variance_limit": 1,
+  "events": [
+    {
+      "event_name": "OFFICIAL_NAME",
+      "path": "LOCAL_FILE.npz",
+      "sha256": "FULL_SHA256"
+    }
+  ],
+  "recovered_injections": {
+    "path": "LOCAL_RECOVERED_INJECTION_WEIGHTS.npz",
+    "sha256": "FULL_SHA256",
+    "n_generated": 1
+  }
+}
