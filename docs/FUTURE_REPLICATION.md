@@ -39,3 +39,5 @@ outside the executable; provenance and precommit timestamps must be audited
 externally. A release containing only revised OLD events is not a new holdout.
 V1/V3/V4 already saw GWTC-5.0; they do not become independent just because
 this protocol was added. A negative future result remains negative.
+
+The prepare phase now records a complete non-residual `release_ledger`: primary old/new identities, p_astro exclusions, invalid masses, and historical IDs not listed as primary. The evaluate phase verifies the exact ledger and historical table hash in addition to the existing frozen config and table hashes. **An external auditor must still verify official cumulative completeness, identity revisions, release chronology and pre-inspection timestamp.** Do not execute #18 on GWTC-5.0 or an old-event-only revision.
