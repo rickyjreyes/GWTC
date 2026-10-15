@@ -15,6 +15,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from gwtc_catalog_version_audit import VERSIONS,version_index
+from gwtc_source_provenance import validate_frozen_csv
 
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
@@ -78,9 +79,10 @@ def main():
     v4=json.loads(a.v4.read_text());prior=json.loads(a.archived_audit.read_text())
     if (v4.get("schema")!="GWTC_V4_STRUCTURED_NULL_FIXED_PREDICTION_V1"
         or v4.get("k_pred")!=9.7 or prior.get("schema")!="GWTC_VERSION_SENSITIVITY_V1"
-        or sha(a.table)!=v4.get("clean_table_sha256") or sha(a.table)!=prior.get("table_sha256")
+        or v4.get("clean_table_sha256")!=prior.get("table_sha256")
         or sha(a.v4)!=prior.get("v4_sha256")):
         raise SystemExit("Original frozen tagged-version provenance mismatch")
+    source_byte_audit=validate_frozen_csv(a.table,v4["clean_table_sha256"])
     v=scored_versions(pd.read_csv(a.table),v4["fixed_mode"])
     ledger,summ=decompose(v)
     published={r["version"]:r for r in prior["results"]}
@@ -95,7 +97,8 @@ def main():
     oc.parent.mkdir(parents=True,exist_ok=True)
     pd.DataFrame(ledger).to_csv(oc,index=False)
     oj.write_text(json.dumps({"schema":"GWTC_TAGGED_RELEASE_SCORE_DECOMPOSITION_V1",
-       "source_table_sha256":sha(a.table),"frozen_v4_sha256":sha(a.v4),
+       "source_table_sha256":sha(a.table),"frozen_source_csv_byte_audit":source_byte_audit,
+       "frozen_v4_sha256":sha(a.v4),
        "prior_version_audit_sha256":sha(a.archived_audit),
        "per_version":[{"version":ver,"selected_n":int(v[ver]["selected"].sum()),
           "score":float(v[ver]["score"].sum()),
