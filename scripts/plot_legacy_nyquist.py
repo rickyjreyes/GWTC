@@ -9,6 +9,8 @@ import argparse
 from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
+matplotlib.rcParams["svg.fonttype"]="none"  # Preserve explicit ALIASED warning as searchable SVG text.
+matplotlib.rcParams["svg.hashsalt"]="gwtc-legacy-nyquist-audit-v1"
 import matplotlib.pyplot as plt
 import pandas as pd
 
