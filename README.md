@@ -133,3 +133,17 @@ python -m pytest -q --basetemp=.pytest_tmp
 ```
 
 This harness is deliberately designed to retain FAIL/PARTIAL outcomes and **requires independent confirmation** before stronger physical claims.
+
+## October 15 maintenance: #15 and future-release readiness #18
+
+- [Historical Nyquist annotations](docs/NYQUIST_HISTORICAL_ANNOTATIONS.md)
+  document that the preserved B=20 exploratory k≈32.70 maximum exceeds its
+  sampling limit (approximately k_N=14.14). Generate the separate derived
+  annotation table with `python scripts/annotate_legacy_nyquist.py`. Frozen
+  V1/V3/V4 and historical scans are not reinterpreted or overwritten.
+- [Future-replication protocol](docs/FUTURE_REPLICATION.md) and the non-scoring
+  `python scripts/check_future_gwtc_readiness.py` document issue #18. Until
+  an independently verified first official cumulative post-GWTC-5.0 catalog
+  with genuinely new physical events exists and its manifest is timestamped
+  BEFORE evaluation, status is **EXTERNALLY_BLOCKED_NO_UNSEEN_RELEASE**.
+  No future-catalog statistic has been evaluated.
