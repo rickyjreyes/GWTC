@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 import math
 import pandas as pd
+from gwtc_source_provenance import validate_frozen_csv
 
 ROOT=Path(__file__).resolve().parents[1]
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -37,8 +38,8 @@ def archived_consistency(root=ROOT):
         raise ValueError("Archived V2 CV selected row/frozen degree mismatch")
     if v3.get("bandwidth_selection")!="training-only leave-one-out log likelihood" or v3.get("baseline_family")!="gaussian_kde":
         raise ValueError("Missing training-selected non-polynomial baseline")
-    if v3.get("manifest_sha256")!=sha(files["manifest"]) or v3.get("clean_table_sha256")!=sha(files["table"]):
-        raise ValueError("Frozen V3 input hash mismatch: manifest recorded="+str(v3.get("manifest_sha256"))+" actual="+sha(files["manifest"])+"; table recorded="+str(v3.get("clean_table_sha256"))+" actual="+sha(files["table"]))
+    manifest_provenance=validate_frozen_csv(files["manifest"],v3.get("manifest_sha256"))
+    table_provenance=validate_frozen_csv(files["table"],v3.get("clean_table_sha256"))
     if not math.isclose(float(v2["k_star"]),float(a["k_frozen"]),rel_tol=0,abs_tol=1e-10) or not math.isclose(float(v3["k_star"]),float(b["k_frozen"]),rel_tol=0,abs_tol=1e-10):
         raise ValueError("Archived fixed-mode evaluation has been retuned")
     if int(a.training_n)!=173 or int(a.holdout_positive_n)!=104 or int(b.holdout_n_positive_finite)!=104:
@@ -58,6 +59,7 @@ def archived_consistency(root=ROOT):
        "v2_frozen_k":float(v2["k_star"]),"v3_frozen_k":float(v3["k_star"]),
        "v2_reference_p":float(a.holdout_p),"v3_reference_p":float(b.p_holdout),
        "v2_nyquist_k":k_n,
+       "frozen_csv_byte_provenance":{"manifest":manifest_provenance,"clean_table":table_provenance},
        "interpretation":"V3 is a robustness reanalysis of previously inspected GWTC-5. The earlier pre-strict CV had holdout exposure. No new independent replication."}
 
 def baseline_gate(posterior=None,posterior_sha=None,root=ROOT):
