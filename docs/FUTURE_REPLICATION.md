@@ -74,3 +74,27 @@ Archive/timestamp this verification. Only THEN follow the original
 `prepare` → external timestamp + immutable manifest hash/commit →
 single `evaluate --locked-manifest-sha256` workflow above. Neither #18 nor
 the future-result verdict may be marked complete from preflight alone.
+
+## Official release index screen (additional non-scoring evidence)
+
+The GWOSC official catalog index is `https://gwosc.org/api/v2/catalogs?format=json`.
+At the 2026-10-15 check it lists GWTC-5.0 but no numbered post-5.0
+release. Archive the *raw* official JSON without editing and screen it:
+
+```bash
+curl -fsSL 'https://gwosc.org/api/v2/catalogs?format=json' -o results/gwosc_catalog_index_raw.json
+python scripts/audit_official_future_catalog_index.py \
+  --snapshot results/gwosc_catalog_index_raw.json \
+  --out results/gwosc_index_screen.json
+```
+
+The screen rejects incomplete pagination, count mismatch, missing baseline,
+duplicate names and non-GWOSC detail links. It records the input SHA256 and
+either `EXTERNALLY_BLOCKED_NO_POST_5_0_IN_INDEX_SNAPSHOT` or
+`CANDIDATE_REQUIRES_EXTERNAL_RELEASE_ATTESTATION`. This is an index snapshot
+check only, **not proof of chronological first publication, a prepared
+manifest, new physical events, or test authorization**. Check official
+publication dates and complete event-table provenance independently before
+using the existing frozen prepare/evaluate steps. Index screening never reads
+event masses or invokes the evaluator. Do not use low-latency alerts or
+revisions to old events as a substitute for the frozen official release rule.
