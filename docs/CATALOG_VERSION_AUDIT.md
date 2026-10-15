@@ -29,3 +29,8 @@ python scripts/gwtc_cumulative_manifest_audit.py --manifest local/cumulative_rel
 ```
 
 Explicit renames require a source-backed `declared_renames` record; unmatched labels are marked **not listed**, never presumed physically removed. The output is descriptive and hash-locked. The old frozen-V4 vs fixed-V3-KDE reference p-values remain in `results/gwtc_catalog_version_audit_results.json`; they are neither physical population-calibrated nor prospective. Reconcile complete official cumulative field/waveform definitions before #12 scientific closure.
+
+
+## Exact score decomposition on the archived tagged rows
+
+Run `python scripts/gwtc_version_score_decomposition.py --out-prefix results/local_tagged_decomposition` with a NEW prefix. It verifies the original clean-table and frozen-V4 hashes and independently reconstructs all three published fixed-mode scores without tuning. Its complete physical-identity ledger decomposes each A-to-B statistic change into contributions from **shared IDs**, **IDs not listed in A**, and **IDs not listed in B**, including selection-cut flips on shared IDs. The three terms add exactly to `T_B-T_A`. This is a descriptive comparison of the existing tagged GWOSC rows, NOT three certified official cumulative snapshots, a test of actual physical removal, a posterior/injection-corrected population analysis or a prospective replication. Reference p-values are retained, but differences between p-values are not additive. A verified official cumulative provenance manifest and official parameter/waveform version reconciliation are still necessary for #12 original scientific closure.
