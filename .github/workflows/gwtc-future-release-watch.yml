@@ -1,0 +1,48 @@
+name: Official GWTC future index watch (NON-SCORING)
+
+on:
+  schedule:
+    - cron: '23 15 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  archive-official-index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download, validate and archive raw GWOSC index (never score events)
+        run: |
+          python scripts/watch_future_gwtc_release.py --out-dir "results/gwosc_official_index_watch_${{ github.run_id }}_${{ github.run_attempt }}"
+      - name: Print non-scoring gate and flag any candidate for manual independent review
+        run: |
+          python - <<'PY'
+          import glob, json, os
+          paths = glob.glob("results/gwosc_official_index_watch_*/non_scoring_screen.json")
+          if len(paths) != 1:
+              raise SystemExit("Expected exactly one screen report")
+          x = json.load(open(paths[0]))
+          assert x["signal_scored"] is False and x["manifest_prepared"] is False
+          summary = ("GWOSC index snapshot SHA256: " + x["snapshot_sha256"] +
+                     "\nStatus: " + x["status"] +
+                     "\nCandidate: " + str(x["first_post_5_0_candidate"]) +
+                     "\nNo event table read; no prospectivity or release chronology attested.\n")
+          print(summary)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as f:
+              f.write("### Non-scoring GWTC #18 release watch\n\n" + summary.replace("\n", "  \n"))
+          if x["first_post_5_0_candidate"]:
+              print("::warning::Possible post-GWTC-5.0 index entry: human release chronology, complete table and new-event attestation REQUIRED before prepare/evaluate.")
+          PY
+      - name: Preserve raw official index and screen as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gwosc-index-watch-${{ github.run_id }}-${{ github.run_attempt }}
+          path: results/gwosc_official_index_watch_*/
+          if-no-files-found: error
+          retention-days: 90
