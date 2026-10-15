@@ -25,3 +25,15 @@ Run `python scripts/annotate_legacy_nyquist.py --input tables/gwtc_scan_primary.
 **Historical primary B=20 k=32.6975, n_star=23.1292 is ABOVE its binned Nyquist limit; it is NOT a resolved mode.** The B=20 bin-stress row is likewise aliased, while B=30/40/50 k=4.48319 rows are below their respective bounds. These overlays retain original reported p/verdict as historical artifacts, but those labels cannot justify a new physical inference from aliased peaks. The V3 unbinned result is not subject to binned Nyquist classification.
 
 The original tables, figure files and p-values are not rewritten. Regenerate any publication use of these legacy binned peaks with the explicit annotation; do not display an aliased peak without this warning.
+
+
+## Presentation guard added after independent Windows audit
+
+`scripts/make_publication_figures.py` now verifies the archived V2 **B=40** frozen frequency against the bin-edge-derived Nyquist limit before plotting either the frozen V2 model or the V2/V3 comparison. It raises on an aliased or internally inconsistent frequency. This is separate from the archived exploratory **B=20** maximum. The latter is NOT drawn as resolved in the frozen-mode figures. A stand-alone explanatory historical plot can be generated without overwriting existing publication files:
+
+```bash
+python scripts/plot_legacy_nyquist.py \
+ --output results/legacy_nyquist/historical_sampling_audit_new.svg
+```
+
+The plot labels the B20 peak **ALIASED: not a resolved mode**, shows the per-binning limits and notes that old p-values/verdicts are archival, not corrected inference. This does not establish the B30/40/50 statistical validity.
