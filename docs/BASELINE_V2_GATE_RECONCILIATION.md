@@ -37,3 +37,8 @@ always preserves `PARTIAL_CLASS_III_NOT_PROMOTED`; full scientific promotion
 still requires independent provenance/interpretation rather than code status.
 Never confuse a posterior-draw sensitivity diagnostic with full hierarchical
 PE and injection analysis or a genuinely unseen future replication.
+
+
+## Stronger archived-input consistency checks (without gate promotion)
+
+`scripts/gwtc_baseline_v2_acceptance.py` now verifies that the selected CV mean row is degree 7 on training data, the V3 non-polynomial KDE was chosen by training-only LOO, V3 original manifest/table SHA values match, V2/V3 evaluated frequencies equal their archived frozen frequencies, the V2 B40 frequency is below its bin-edge Nyquist limit, the training/holdout counts are 173/104, the canonical holdout manifest has no duplicate names, and V3 explicitly identifies itself as robustness rather than untouched independent replication. Contradictions fail closed; missing archived sources are reported without fabricating a PASS. The scientific status remains `PARTIAL_CLASS_III_NOT_PROMOTED` and #11 remains mandatory.
