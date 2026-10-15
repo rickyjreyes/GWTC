@@ -11,9 +11,55 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import math
+import pandas as pd
 
 ROOT=Path(__file__).resolve().parents[1]
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def archived_consistency(root=ROOT):
+    """Check archived cross-file identities; never reinterpret the original tests."""
+    files={name:root/"tables"/filename for name,filename in {
+        "cv":"gwtc_baseline_v2_cv.csv","v2":"gwtc_frozen_mode.json",
+        "v3":"gwtc_v3_frozen_unbinned_kde_mode.json",
+        "v2_result":"gwtc_frozen_holdout_result.csv",
+        "v3_result":"gwtc_v3_unbinned_kde_holdout_result.csv",
+        "manifest":"gwtc_holdout_manifest.csv","table":"gwtc_events_clean.csv"}.items()}
+    absent=sorted(k for k,v in files.items() if not v.exists())
+    if absent:return {"status":"INCOMPLETE_ARCHIVED_INPUTS","missing":absent}
+    cv=pd.read_csv(files["cv"]);v2=json.loads(files["v2"].read_text())
+    v3=json.loads(files["v3"].read_text())
+    a=pd.read_csv(files["v2_result"]).iloc[0]
+    b=pd.read_csv(files["v3_result"]).iloc[0]
+    held=pd.read_csv(files["manifest"])
+    selected=cv.loc[cv.selected.astype(str).str.lower().eq("true") &
+                    cv.fold.astype(str).eq("mean")]
+    if len(selected)!=1 or selected.iloc[0].data_split!="train" or selected.iloc[0].baseline_family!="polynomial_poisson" or int(selected.iloc[0].degree)!=int(v2["baseline_degree"]):
+        raise ValueError("Archived V2 CV selected row/frozen degree mismatch")
+    if v3.get("bandwidth_selection")!="training-only leave-one-out log likelihood" or v3.get("baseline_family")!="gaussian_kde":
+        raise ValueError("Missing training-selected non-polynomial baseline")
+    if v3.get("manifest_sha256")!=sha(files["manifest"]) or v3.get("clean_table_sha256")!=sha(files["table"]):
+        raise ValueError("Frozen V3 input hashes do not match archived artifacts")
+    if not math.isclose(float(v2["k_star"]),float(a["k_frozen"]),rel_tol=0,abs_tol=1e-10) or not math.isclose(float(v3["k_star"]),float(b["k_frozen"]),rel_tol=0,abs_tol=1e-10):
+        raise ValueError("Archived fixed-mode evaluation has been retuned")
+    if int(a.training_n)!=173 or int(a.holdout_positive_n)!=104 or int(b.holdout_n_positive_finite)!=104:
+        raise ValueError("Frozen source population/count drift")
+    names=held.loc[held.split=="holdout","event_name"].astype(str)
+    if names.duplicated().any() or len(names)!=int(b.holdout_manifest_rows):
+        raise ValueError("Invalid archived holdout manifest")
+    if str(b.scientific_status)!="ROBUSTNESS_TEST_NOT_INDEPENDENT_REPLICATION" or str(a.class_i_claim).lower() not in ("false","0"):
+        raise ValueError("Historical promotion/robustness status drift")
+    width=float(v2["bin_edges"][-1])-float(v2["bin_edges"][0])
+    k_n=math.pi*int(v2["bins"])/width
+    if float(v2["k_star"])>=k_n*(1-1e-10) or not math.isclose(k_n,float(v2["nyquist_k"]),rel_tol=1e-10):
+        raise ValueError("Archived V2 mode fails sampling Nyquist")
+    return {"status":"ARCHIVED_CONSISTENT_NOT_PROSPECTIVE_REPLICATION",
+       "training_n":173,"holdout_positive_n":104,"v2_selected_polynomial_degree":int(v2["baseline_degree"]),
+       "v3_baseline":"training-only Gaussian KDE",
+       "v2_frozen_k":float(v2["k_star"]),"v3_frozen_k":float(v3["k_star"]),
+       "v2_reference_p":float(a.holdout_p),"v3_reference_p":float(b.p_holdout),
+       "v2_nyquist_k":k_n,
+       "interpretation":"V3 is a robustness reanalysis of previously inspected GWTC-5. The earlier pre-strict CV had holdout exposure. No new independent replication."}
+
 def baseline_gate(posterior=None,posterior_sha=None,root=ROOT):
     frozen=root/"tables/gwtc_v4_frozen_structured_null.json"
     required={
@@ -43,6 +89,7 @@ def baseline_gate(posterior=None,posterior_sha=None,root=ROOT):
              "mean_minus_point":obj.get("posterior_mean_minus_point_statistic"),
              "posterior_draw_quantiles":obj.get("posterior_draw_score_quantiles_05_50_95")}
     gates["posterior_measurement_uncertainty"]=post
+    gates["archived_cross_file_consistency"]=archived_consistency(root)
     return {"schema":"GWTC_BASELINE_V2_ACCEPTANCE_RECONCILIATION_V1",
        "gates":gates,"original_holdout_provenance_caveat":"Earlier pre-strict CV had already seen holdout; do not claim an untouched independent historical replication.",
        "classification":"PARTIAL_CLASS_III_NOT_PROMOTED",
