@@ -30,3 +30,10 @@ For data-dependent procedures see docs/CATALOG_VERSION_AUDIT.md,
 POSTERIOR_UNCERTAINTY.md, HIERARCHICAL_CHALLENGE.md,
 OFFICIAL_OBSERVABLES.md, HISTORICAL_MODE_COHERENCE.md and FUTURE_REPLICATION.md.
 Never execute prospective #18 evaluation against GWTC-5.0 that already influenced V3/V4.
+
+
+## Targeted #15/#3/#12 follow-up
+
+The publication generator now fail-closes on inconsistent/aliased V2 bin-edge Nyquist, and `scripts/plot_legacy_nyquist.py` renders a separate explicitly aliased B20 archival figure, with non-overwriting output. The frozen baseline-v2 gate now cross-checks actual training CV and V3 KDE provenance, frozen frequencies, split counts, the V2 B40 Nyquist and V3's historical robustness label; it retains PARTIAL/Class III and reports byte-only LF/CRLF representation differences without altering freeze hashes. The original #11 posterior execution remains missing.
+
+For #12, the original GWTC release-tagged rows have zero identity overlap between 5.0 and either 4.x subset. CI reproduced all three archived fixed-mode scores and decomposed the changes. `gwtc_cumulative_frozen_reference.py` is ready for independently supplied official cumulative snapshots but has not been run on them. The added CI evidence job archives the executed #3/#12/#15 local results and SVGs; no original frozen table or figure is overwritten.
