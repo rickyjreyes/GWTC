@@ -44,6 +44,34 @@ def selected_names(future, historical, cfg):
         raise ValueError("No genuinely unseen events meeting frozen p_astro cut")
     return new.sort_values("commonName")
 
+def release_ledger(future, historical, cfg):
+    """Metadata-only dispositions for EVERY official canonical primary identity.
+
+    An external auditor must still attest official completeness/release order.
+    No residual, frequency or statistic is computed in this function.
+    """
+    required={"commonName","M_chirp","p_astro","is_primary_entry"}
+    if not required.issubset(future):raise ValueError("Incomplete official cumulative table")
+    if future.commonName.isna().any() or historical.commonName.isna().any():
+        raise ValueError("Missing merger identity")
+    primary=future.loc[primary_mask(future)].copy()
+    if primary.commonName.duplicated().any():raise ValueError("Duplicate canonical primary merger")
+    old=set(historical.commonName.astype(str))
+    new=primary.loc[~primary.commonName.astype(str).isin(old)].copy()
+    prob=pd.to_numeric(new.p_astro,errors="coerce")
+    mask=prob>=cfg["selection"]["p_astro_min_inclusive"]
+    eligible=new.loc[mask]
+    mass=pd.to_numeric(eligible.M_chirp,errors="coerce").to_numpy(float)
+    return {
+      "n_release_rows":int(len(future)),
+      "n_primary_rows":int(len(primary)),
+      "old_primary_names":sorted(set(primary.commonName.astype(str))&old),
+      "new_primary_names_before_cut":sorted(new.commonName.astype(str).tolist()),
+      "new_names_below_or_missing_pastro":sorted(new.loc[~mask,"commonName"].astype(str).tolist()),
+      "eligible_names":sorted(eligible.commonName.astype(str).tolist()),
+      "eligible_invalid_mass_names":sorted(eligible.loc[~(np.isfinite(mass)&(mass>0)),"commonName"].astype(str).tolist()),
+      "historical_names_not_listed_as_primary":sorted(old-set(primary.commonName.astype(str)))}
+
 def check_historical(cfg):
     path = Path(cfg["historical_table_path"])
     if sha(path) != cfg["historical_table_sha256"]:
@@ -75,6 +103,7 @@ def main():
     future = pd.read_csv(args.future_table)
     historical = pd.read_csv(cfg["historical_table_path"])
     new = selected_names(future, historical, cfg)
+    ledger = release_ledger(future, historical, cfg)
     if args.stage == "prepare":
         if not (args.source_url and args.release_id and args.published_utc):
             raise SystemExit("Official source URL, release ID and publication date required")
@@ -87,6 +116,7 @@ def main():
             "table_sha256": sha(args.future_table),
             "historical_table_sha256": sha(cfg["historical_table_path"]),
             "selected_event_names": new.commonName.astype(str).tolist(),
+            "release_ledger": ledger,
             "eligible_rows_before_finite_mass_filter": int(len(new)),
         }
         args.manifest.parent.mkdir(parents=True, exist_ok=True)
@@ -99,7 +129,9 @@ def main():
     if (m["schema"] != "GWTC_FUTURE_EVENT_MANIFEST_V1"
         or m["config_sha256"] != sha(args.config)
         or m["table_sha256"] != sha(args.future_table)
-        or m["selected_event_names"] != new.commonName.astype(str).tolist()):
+        or m["selected_event_names"] != new.commonName.astype(str).tolist()
+        or m.get("release_ledger") != ledger
+        or m.get("historical_table_sha256") != sha(cfg["historical_table_path"])):
         raise SystemExit("Frozen manifest does not match current release/config/event selection")
     mass = pd.to_numeric(new.M_chirp, errors="coerce").to_numpy(float)
     valid = np.isfinite(mass) & (mass > 0)

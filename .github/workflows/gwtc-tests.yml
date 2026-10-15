@@ -1,7 +1,7 @@
 name: GWTC correctness
 on:
   push:
-    branches: ["agent/gwtc-issues-implementation-20261014"]
+    branches: ["main", "agent/gwtc-remaining-issues-*"]
   pull_request:
     paths:
       - "scripts/**"
@@ -24,3 +24,16 @@ jobs:
         run: python -m compileall -q scripts tests
       - name: Unit and regression tests
         run: python -m pytest -q --basetemp=.pytest_tmp
+      - name: Reproduce targeted archived science gates (no data mutation)
+        run: |
+          mkdir -p "${RUNNER_TEMP}/gwtc_targeted"
+          python scripts/gwtc_version_score_decomposition.py --out-prefix "${RUNNER_TEMP}/gwtc_targeted/tagged_release"
+          python scripts/gwtc_baseline_v2_acceptance.py --output "${RUNNER_TEMP}/gwtc_targeted/baseline_v2_gate.json"
+          python scripts/plot_legacy_nyquist.py --output "${RUNNER_TEMP}/gwtc_targeted/historical_nyquist.svg"
+          python scripts/make_publication_figures.py --output-dir "${RUNNER_TEMP}/gwtc_targeted/publication" --formats svg
+      - name: Preserve targeted archival audit artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: gwtc-targeted-audits
+          path: ${{ runner.temp }}/gwtc_targeted/
+          if-no-files-found: error

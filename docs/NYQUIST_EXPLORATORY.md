@@ -17,3 +17,26 @@ historical results remain descriptive and should be annotated if reused.
 
 This numerical sampling limit is not an astrophysical upper-frequency bound.
 It does not apply to unbinned likelihoods.
+
+## Archived read-only presentation overlays
+
+Run `python scripts/annotate_legacy_nyquist.py --input tables/gwtc_scan_primary.csv --output results/legacy_nyquist/primary_new.csv` (choose a new output filename; no overwrite). The repository also includes frozen-base overlays at `results/legacy_nyquist/gwtc_scan_primary_annotated.csv` and `gwtc_bin_stress_annotated.csv`. The legacy width is inferred from saved `n_star=k_best*Delta_ell/(2*pi)`, not from newly retrieved events.
+
+**Historical primary B=20 k=32.6975, n_star=23.1292 is ABOVE its binned Nyquist limit; it is NOT a resolved mode.** The B=20 bin-stress row is likewise aliased, while B=30/40/50 k=4.48319 rows are below their respective bounds. These overlays retain original reported p/verdict as historical artifacts, but those labels cannot justify a new physical inference from aliased peaks. The V3 unbinned result is not subject to binned Nyquist classification.
+
+The original tables, figure files and p-values are not rewritten. Regenerate any publication use of these legacy binned peaks with the explicit annotation; do not display an aliased peak without this warning.
+
+
+## Presentation guard added after independent Windows audit
+
+`scripts/make_publication_figures.py` now verifies the archived V2 **B=40** frozen frequency against the bin-edge-derived Nyquist limit before plotting either the frozen V2 model or the V2/V3 comparison. It raises on an aliased or internally inconsistent frequency. This is separate from the archived exploratory **B=20** maximum. The latter is NOT drawn as resolved in the frozen-mode figures. A stand-alone explanatory historical plot can be generated without overwriting existing publication files:
+
+```bash
+python scripts/plot_legacy_nyquist.py \
+ --output results/legacy_nyquist/historical_sampling_audit_new.svg
+```
+
+The plot labels the B20 peak **ALIASED: not a resolved mode**, shows the per-binning limits and notes that old p-values/verdicts are archival, not corrected inference. This does not establish the B30/40/50 statistical validity.
+
+
+The targeted CI run executed the standalone historical audit figure and the entire publication generator into a fresh temporary directory; its SVGs are uploaded as `gwtc-targeted-audits` workflow artifacts. The V2/V3 publication generator rejects a hypothetical above-Nyquist V2 k. The historical B20 figure explicitly marks its old peak as **ALIASED**, and SVG text remains searchable. The source publication manuscript and any user's local modified figures must still be checked independently before reusing archival plots.

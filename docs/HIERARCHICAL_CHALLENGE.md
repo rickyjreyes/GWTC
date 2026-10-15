@@ -35,3 +35,19 @@ population-parameter marginal evidence, or Bayes factor. Remaining #8 gate:
 Official data: https://zenodo.org/records/20348005 ;
 https://zenodo.org/records/20348006 ;
 https://zenodo.org/records/19500052 .
+
+
+## Baseline-model integration after verified single-Lambda runs
+
+`scripts/gwtc_hierarchical_baseline_grid.py --grid-manifest local/h0_grid.json
+--output results/h0_grid_conditional.json` consumes individually SHA-verified
+outputs from `gwtc_hierarchical_fixed_mode.py` using
+`manifests/hierarchical_baseline_grid.template.json`. The H0 posterior
+weights **must be derived/frozen from the no-periodic full-parameter population
+inference**, sum to one and be consistent with the same event set, V4 freeze,
+PE priors and recovered-injection campaign. The correct integrated ratio is
+`2 log[sum_Lambda p(Lambda|d,H0)*exp(0.5*Delta_2logL(Lambda))]`;
+averaging logLR is incorrect. Numerical INCOMPLETE results and mismatched
+event sets/frozen modes are rejected. Template defaults to not yet frozen.
+This is a conditional model-averaging *mechanism*, not a physical verification,
+null calibration or empirical Bayes factor from actual official data.

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 
 import matplotlib as mpl
@@ -77,8 +78,24 @@ def make_protocol(out: Path, formats: list[str]) -> None:
     _save(fig, out / "publication_protocol", formats)
 
 
+def validated_v2_nyquist(v2: dict) -> float:
+    """Publication guard: the binned frozen mode must be below the actual bin-edge Nyquist."""
+    bins = int(v2["bins"])
+    edges = [float(x) for x in v2["bin_edges"]]
+    if bins < 2 or len(edges) != bins+1 or not all(math.isfinite(x) for x in edges) or any(b <= a for a,b in zip(edges,edges[1:])):
+        raise ValueError("Invalid frozen V2 bin edges")
+    width=edges[-1]-edges[0]
+    nyquist=math.pi*bins/width
+    k=float(v2["k_star"])
+    if not math.isfinite(k) or k <= 0 or k >= nyquist*(1-1e-10):
+        raise ValueError("Aliased frozen V2 publication frequency")
+    if not math.isclose(float(v2["delta_ell_active"]),width,rel_tol=1e-10) or not math.isclose(float(v2["nyquist_k"]),nyquist,rel_tol=1e-10):
+        raise ValueError("Inconsistent V2 Nyquist metadata")
+    return nyquist
+
 def make_v2_frozen_model(out: Path, formats: list[str]) -> None:
     v2 = _load_json("gwtc_frozen_mode.json")
+    validated_v2_nyquist(v2)
     fig, ax = plt.subplots(figsize=(7.2, 4.6))
     ax.plot(v2["bin_centers"], v2["baseline_probabilities"], label="Degree-7 smooth baseline")
     ax.plot(
@@ -88,7 +105,7 @@ def make_v2_frozen_model(out: Path, formats: list[str]) -> None:
     )
     ax.set_xlabel(r"$\ell = \ln(M_{\rm chirp})$")
     ax.set_ylabel("frozen bin probability")
-    ax.set_title("V2 training-frozen chirp-mass model")
+    ax.set_title("V2 training-frozen chirp-mass model (B=40, Nyquist-resolved)")
     ax.legend(frameon=False)
     fig.tight_layout()
     _save(fig, out / "publication_v2_frozen_model", formats)
@@ -120,12 +137,13 @@ def make_v3_frequency_scan(out: Path, formats: list[str]) -> None:
 def make_cross_method_frequency(out: Path, formats: list[str]) -> None:
     v2 = _load_json("gwtc_frozen_mode.json")
     v3 = _load_json("gwtc_v3_frozen_unbinned_kde_mode.json")
+    validated_v2_nyquist(v2)
     fig, ax = plt.subplots(figsize=(7.2, 3.6))
     ax.axvspan(9.5, 10.0, alpha=0.15, label="Prospective interval")
     ax.axvline(9.7, linestyle="--", label="Prospective center")
     ks = [v2["k_star"], v3["k_star"]]
     ax.scatter(ks, [1, 0], s=90)
-    ax.set_yticks([1, 0], ["V2 binned Poisson", "V3 unbinned KDE"])
+    ax.set_yticks([1, 0], ["V2 B=40 (Nyquist-resolved)", "V3 unbinned KDE"])
     ax.set_xlim(9.3, 10.1)
     ax.set_xlabel("selected log-frequency k")
     ax.set_title("Cross-method frequency agreement")

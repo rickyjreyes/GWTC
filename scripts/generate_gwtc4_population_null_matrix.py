@@ -339,6 +339,7 @@ def main() -> None:
     ap.add_argument("--batch-size", type=int, default=128)
     ap.add_argument("--verify-only", action="store_true")
     ap.add_argument("--output-coherence", default=None, help="Optional FULL outer-null peak k/phase/n/event-membership CSV for #10")
+    ap.add_argument("--output-observed-coherence", default=None, help="Matching observed best-k/phase/n/event-membership CSV; required with --output-coherence")
     ap.add_argument(
         "--output-matrix", default="tables/gwtc4_population_null_matrix.csv"
     )
@@ -353,6 +354,8 @@ def main() -> None:
     )
     args = ap.parse_args()
 
+    if bool(args.output_observed_coherence) != bool(args.output_coherence):
+        raise SystemExit("Provide BOTH --output-observed-coherence and --output-coherence")
     if args.outer_n < 2 and not args.verify_only:
         raise SystemExit("--outer-n must be at least 2")
     if args.n_k < 2:
@@ -397,6 +400,7 @@ def main() -> None:
     # grid, selector set, event table, weighting rule, or baseline degree.
     observed_recalc_k = np.empty(len(observed), dtype=float)
     observed_recalc_delta = np.empty(len(observed), dtype=float)
+    observed_details = []
     prepared_fixed: Dict[int, PreparedScan] = {}
 
     original_y_map = event_value_map(event_df, "final_spin_median")
@@ -412,7 +416,14 @@ def main() -> None:
             args.degree,
         )
         y = y_for_events(original_y_map, prep.events)
-        k_best, delta = score_prepared_one(prep, y)
+        if args.output_observed_coherence:
+            d = score_prepared_one_details(prep, y)
+            k_best, delta = d["k_best"], d["delta_chi2"]
+            observed_details.append({"scan_id":row["scan_id"],"x_var":row["x_var"],"y_var":row["y_var"],
+                "events":d["events"],"k_best":k_best,"phase":d["phase"],
+                "n_obs":d["n_obs"],"delta_x":d["delta_x"]})
+        else:
+            k_best, delta = score_prepared_one(prep, y)
         observed_recalc_k[i] = k_best
         observed_recalc_delta[i] = delta
         if not is_dynamic_subset(subset_name):
@@ -436,6 +447,18 @@ def main() -> None:
         )
 
     print("Observed reproduction     : PASS")
+    if args.output_observed_coherence:
+        od = pd.DataFrame(observed_details)
+        if len(od) != len(observed) or od.scan_id.duplicated().any():
+            raise SystemExit("Incomplete/duplicate observed coherence records")
+        if "events" in observed.columns:
+            if [set(str(x).split(",")) for x in od.events] != [set(str(x).split(",")) for x in observed.events]:
+                raise SystemExit("Observed membership differs from historical records")
+        if "phase" in observed.columns:
+            saved = pd.to_numeric(observed.phase,errors="coerce").to_numpy(float)
+            delta_phase=np.abs(np.arctan2(np.sin(od.phase.to_numpy(float)-saved),np.cos(od.phase.to_numpy(float)-saved)))
+            if not np.isfinite(delta_phase).all() or delta_phase.max()>1e-5:
+                raise SystemExit("Observed phase differs from historical records")
 
     metadata = {
         "schema": "GWTC4_POPULATION_OUTER_NULL_V1",
@@ -472,6 +495,14 @@ def main() -> None:
         meta_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
         print(f"Wrote metadata            : {meta_path}")
         return
+
+    if args.output_observed_coherence:
+        observed_coh_path=Path(args.output_observed_coherence)
+        for p in [observed_coh_path,Path(args.output_coherence)]:
+            if p.exists(): raise SystemExit(f"Refusing overwrite of coherence artifact: {p}")
+        observed_coh_path.parent.mkdir(parents=True,exist_ok=True)
+        od.to_csv(observed_coh_path,index=False)
+        metadata["output_observed_coherence_details"]=str(observed_coh_path)
 
     # Create the shared outer-null catalogs once at the event level.
     y_perm, finite_idx = make_outer_permutations(event_df, args.outer_n, args.seed)
