@@ -37,3 +37,6 @@ python scripts/plot_legacy_nyquist.py \
 ```
 
 The plot labels the B20 peak **ALIASED: not a resolved mode**, shows the per-binning limits and notes that old p-values/verdicts are archival, not corrected inference. This does not establish the B30/40/50 statistical validity.
+
+
+The targeted CI run executed the standalone historical audit figure and the entire publication generator into a fresh temporary directory; its SVGs are uploaded as `gwtc-targeted-audits` workflow artifacts. The V2/V3 publication generator rejects a hypothetical above-Nyquist V2 k. The historical B20 figure explicitly marks its old peak as **ALIASED**, and SVG text remains searchable. The source publication manuscript and any user's local modified figures must still be checked independently before reusing archival plots.
