@@ -39,8 +39,8 @@ def make_figure(df,output):
         alias=r.nyquist_status.startswith("ALIASED")
         label=("Aliased historical peak" if first_alias else None) if alias else ("Below-Nyquist historical peak" if first_below else None)
         ax.scatter([r.bin_count],[r.k_best],marker="x" if alias else "o",s=90,label=label)
-        first_alias=first_alias and not alias
-        first_below=first_below and alias
+        if alias: first_alias=False
+        else: first_below=False
         ax.annotate("ALIASED: not a resolved mode" if alias else "Below Nyquist",
                     (r.bin_count,r.k_best),xytext=(5,7),textcoords="offset points",fontsize=8)
     ax.set_xlabel("Archived exploratory bin count B")
