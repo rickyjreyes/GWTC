@@ -98,3 +98,35 @@ publication dates and complete event-table provenance independently before
 using the existing frozen prepare/evaluate steps. Index screening never reads
 event masses or invokes the evaluator. Do not use low-latency alerts or
 revisions to old events as a substitute for the frozen official release rule.
+
+## Scheduled official index watch (non-scoring; #18)
+
+`.github/workflows/gwtc-future-release-watch.yml` runs daily (and via manual
+`workflow_dispatch`) using only read-only GitHub repository permissions. It
+downloads the official GWOSC JSON using
+`scripts/watch_future_gwtc_release.py`, validates the same complete-index
+guards as the manual index screen, and uploads the **unaltered raw response**
+plus a SHA256-linked JSON report in a fresh per-run Actions artifact (90-day
+retention, subject to repository settings). Workflow logs and summaries
+show the observed UTC timestamp and any first numbered post-5.0 *candidate*.
+Run failure on malformed/incomplete data is an operational alert, not a negative
+scientific result. No source data or holdout table is included in the watcher;
+there are no credentials to write issues or change the frozen protocol.
+
+The first index appearance is **not** evidence of earliest publication,
+cumulative table completeness, genuinely new physical mergers, precommitted
+manifest, or human non-inspection. A candidate still requires the independent
+external chronology and identity checks above and then the original frozen
+prepare → external timestamp → **one-shot evaluate** sequence. The workflow
+does not and must never auto-run the evaluator.
+
+Manual reproduction (use a fresh directory on every run):
+
+```bash
+python scripts/watch_future_gwtc_release.py --out-dir results/index_watch_manual_001
+# Offline exact-byte screen: --snapshot results/gwosc_catalog_index_raw_20261015.json
+```
+
+An Actions artifact expires: independently preserve important snapshots,
+hashes, publication attestation and original timestamps before scientific use.
+Until the external release occurs, #18 remains OPEN.
