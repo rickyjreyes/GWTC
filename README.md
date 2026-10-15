@@ -147,3 +147,8 @@ This harness is deliberately designed to retain FAIL/PARTIAL outcomes and **requ
   with genuinely new physical events exists and its manifest is timestamped
   BEFORE evaluation, status is **EXTERNALLY_BLOCKED_NO_UNSEEN_RELEASE**.
   No future-catalog statistic has been evaluated.
+
+
+### GWTC #18 — official, non-scoring release-index audit
+
+Download the current [GWOSC catalog-index JSON](https://gwosc.org/api/v2/catalogs?format=json) and run `scripts/audit_official_future_catalog_index.py` as documented in [FUTURE_REPLICATION](docs/FUTURE_REPLICATION.md). The raw snapshot is checksum-recorded. This does not score a new event, establish chronology automatically or supersede the locked future experiment. As of the October 15 check the official index contains no numbered post-GWTC-5.0 release, so #18 remains externally blocked.
