@@ -38,7 +38,7 @@ def archived_consistency(root=ROOT):
     if v3.get("bandwidth_selection")!="training-only leave-one-out log likelihood" or v3.get("baseline_family")!="gaussian_kde":
         raise ValueError("Missing training-selected non-polynomial baseline")
     if v3.get("manifest_sha256")!=sha(files["manifest"]) or v3.get("clean_table_sha256")!=sha(files["table"]):
-        raise ValueError("Frozen V3 input hashes do not match archived artifacts")
+        raise ValueError("Frozen V3 input hash mismatch: manifest recorded="+str(v3.get("manifest_sha256"))+" actual="+sha(files["manifest"])+"; table recorded="+str(v3.get("clean_table_sha256"))+" actual="+sha(files["table"]))
     if not math.isclose(float(v2["k_star"]),float(a["k_frozen"]),rel_tol=0,abs_tol=1e-10) or not math.isclose(float(v3["k_star"]),float(b["k_frozen"]),rel_tol=0,abs_tol=1e-10):
         raise ValueError("Archived fixed-mode evaluation has been retuned")
     if int(a.training_n)!=173 or int(a.holdout_positive_n)!=104 or int(b.holdout_n_positive_finite)!=104:
