@@ -5,7 +5,7 @@ Each original file is size/MD5 checked and SHA256 hashed before extracting all
 samples. Raw files are removed only after their receipt and verified projection
 are saved. These projections are local derivatives, not official HDF5 products.
 """
-import argparse,csv,hashlib,json,subprocess
+import argparse,csv,hashlib,json,subprocess,time
 from pathlib import Path
 import h5py,numpy as np
 from recover_official_pe_inputs import verify_file
@@ -26,7 +26,32 @@ def project(row,raw,directory):
   source_mass_array_sha256=hashlib.sha256(mass.tobytes()).hexdigest(),projection_lossless_verified=True)
  return receipt
 
-def run(mapping,shard,shards,output):
+def accepted_projection(row,receipt,directory):
+ """Only reuse a projection bound to this exact official identity and bytes."""
+ for key in ('event_name','source_url','official_md5','bytes','dataset_path','waveform'):
+  if receipt.get(key)!=row.get(key):raise ValueError('cached source identity mismatch: '+key)
+ if receipt.get('status')!='VERIFIED' or not receipt.get('md5_verified') or not receipt.get('projection_lossless_verified'):
+  raise ValueError('cached raw verification missing')
+ path=directory/receipt['projection_filename']
+ if path.name!=row['event_name']+'.hdf5' or path.parent!=directory:raise ValueError('unexpected projection filename')
+ if file_sha(path)!=receipt['projection_sha256']:raise ValueError('cached projection checksum mismatch')
+ return receipt
+
+def retrieve(row,raw):
+ """Resume partial transfers, with bounded retries for TLS resets/timeouts."""
+ url=row['source_url'].replace('/api/records/','/records/').removesuffix('/content')+'?download=1'
+ errors=[]
+ for attempt in range(4):
+  p=subprocess.run(['curl','--http1.1','-L','--fail','--silent','--show-error',
+   '--connect-timeout','60','--max-time','900','--speed-time','120','--speed-limit','512',
+   '--continue-at','-',url,'-o',str(raw)],capture_output=True,text=True)
+  if not p.returncode:return
+  errors.append(p.stderr.strip())
+  if p.returncode==33:raw.unlink(missing_ok=True) # server explicitly refused Range
+  if attempt<3:time.sleep(5*(attempt+1))
+ raise RuntimeError('\n'.join(errors))
+
+def run(mapping,shard,shards,output,seed=None):
  output.mkdir(parents=True,exist_ok=True);scratch=output/'raw';scratch.mkdir(exist_ok=True)
  obj=json.loads(mapping.read_text());allrows=sorted(obj['events'],key=lambda x:x['event_name'])
  rows=allrows[shard::shards];receipts=[]
@@ -34,26 +59,27 @@ def run(mapping,shard,shards,output):
   raw=scratch/row.get('filename',row['event_name'])
   try:
    if row['status']!='MAPPED_NOT_DOWNLOADED':raise ValueError('metadata mapping not accepted')
-   url=row['source_url'].replace('/api/records/','/records/').removesuffix('/content')+'?download=1'
-   command=['curl','-L','--fail','--silent','--show-error','--connect-timeout','20','--max-time','1800',
-    '--speed-time','90','--speed-limit','1024','--retry','2','--retry-delay','5',url,'-o',str(raw)]
-   p=subprocess.run(command,capture_output=True,text=True)
-   if p.returncode:raise RuntimeError(p.stderr.strip())
-   r=project(row,raw,output);receipts.append(r)
+   cached=seed/(row['event_name']+'.receipt.json') if seed else None
+   if cached and cached.exists():
+    r=accepted_projection(row,json.loads(cached.read_text()),seed)
+    (output/r['projection_filename']).write_bytes((seed/r['projection_filename']).read_bytes())
+   else:
+    retrieve(row,raw);r=project(row,raw,output)
+   receipts.append(r)
    (output/(row['event_name']+'.receipt.json')).write_text(json.dumps(r,indent=2)+'\n')
-   raw.unlink()
+   raw.unlink(missing_ok=True)
   except (OSError,ValueError,KeyError,RuntimeError) as exc:
    receipts.append({**row,'status':'FAILED','error':str(exc)})
    raw.unlink(missing_ok=True)
   print(row['event_name'],receipts[-1]['status'],flush=True)
- (output/f'shard{shard}.json').write_text(json.dumps({'mapping_sha256':file_sha(mapping),'events':receipts},indent=2)+'\n')
+  (output/f'shard{shard}.json').write_text(json.dumps({'mapping_sha256':file_sha(mapping),'events':receipts},indent=2)+'\n')
  if any(r['status']!='VERIFIED' for r in receipts):raise SystemExit(2)
 
 def collect(directory,mapping):
- receipts=[]
- for path in sorted(directory.glob('shard*.json')):receipts.extend(json.loads(path.read_text())['events'])
- expected=json.loads(mapping.read_text())['events'];byname={r['event_name']:r for r in receipts if r['status']=='VERIFIED'}
- if len(byname)!=sum(r['status']=='VERIFIED' for r in receipts):raise ValueError('duplicate shard event')
+ receipts=[json.loads(p.read_text()) for p in sorted(directory.glob('*.receipt.json'))]
+ expected=json.loads(mapping.read_text())['events'];identities={r['event_name']:r for r in expected}
+ byname={r['event_name']:accepted_projection(identities[r['event_name']],r,directory) for r in receipts}
+ if len(byname)!=len(receipts):raise ValueError('duplicate shard event')
  manifest=[]
  for name,r in sorted(byname.items()):
   path=directory/r['projection_filename']
@@ -69,7 +95,7 @@ def collect(directory,mapping):
 
 def main():
  p=argparse.ArgumentParser();p.add_argument('--mapping',type=Path,default=Path('results/official_2026-10-15/pe_input_mapping.json'))
- p.add_argument('--shard',type=int,default=0);p.add_argument('--shards',type=int,default=8);p.add_argument('--output',type=Path,required=True);p.add_argument('--collect',action='store_true');a=p.parse_args()
+ p.add_argument('--shard',type=int,default=0);p.add_argument('--shards',type=int,default=8);p.add_argument('--output',type=Path,required=True);p.add_argument('--seed',type=Path);p.add_argument('--collect',action='store_true');a=p.parse_args()
  if a.collect:collect(a.output,a.mapping)
- else:run(a.mapping,a.shard,a.shards,a.output)
+ else:run(a.mapping,a.shard,a.shards,a.output,a.seed)
 if __name__=='__main__':main()
