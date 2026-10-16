@@ -1,12 +1,14 @@
 name: Official PE execution for frozen GWTC statistic
 on:
   pull_request:
-    paths:
-      - 'scripts/run_official_pe_shard.py'
-      - 'scripts/recover_official_pe_inputs.py'
-      - 'results/official_2026-10-15/pe_input_mapping.json'
-      - '.github/workflows/official-pe-execution.yml'
+    # Bulk official data transfer is not repeated on every documentation push.
+    types: [opened]
   workflow_dispatch:
+    inputs:
+      seed_run_id:
+        description: 'Optional prior verified artifact run; expired/missing seed falls back to raw retrieval'
+        default: '38846477220'
+        required: false
 permissions:
   contents: read
   actions: read
@@ -26,9 +28,10 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install numpy==2.3.5 pandas h5py
       - uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           github-token: ${{ github.token }}
-          run-id: 38846477220
+          run-id: ${{ inputs.seed_run_id || '38846477220' }}
           pattern: pe-shard-*
           merge-multiple: true
           path: previous_pe_products

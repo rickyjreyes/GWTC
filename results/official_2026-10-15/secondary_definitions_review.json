@@ -1,0 +1,44 @@
+{
+  "schema": "GWTC_SECONDARY_OFFICIAL_DEFINITIONS_V1",
+  "release_scope": "GWTC-5.0 Stable Release 9; exact producer-version binding is not established",
+  "definition_sources": [
+    {
+      "url": "https://lscsoft.docs.ligo.org/pesummary/stable/gw/parameters.html",
+      "sha256": "47c5a5045bea897309d4b0743d4df037151401052716cd98d1b2e83f8ddc875c"
+    },
+    {
+      "url": "https://lscsoft.docs.ligo.org/pesummary/stable/core/file_formats.html",
+      "sha256": "213f0a766abbf867f56c483538ed91cc772a3d13247974ef6eaec90a0b99b1a2"
+    }
+  ],
+  "observables": [
+    {
+      "observable": "E_rad",
+      "exact_field": "radiated_energy",
+      "official_definition_url": "https://lscsoft.docs.ligo.org/pesummary/stable/gw/parameters.html",
+      "release_id": "GWTC-5.0 stable release 9 / Zenodo 20348005+20348006",
+      "definition_sha256": "47c5a5045bea897309d4b0743d4df037151401052716cd98d1b2e83f8ddc875c",
+      "units": "M_sun mass-equivalent (generic PESummary labels; release binding unverified)",
+      "frame_convention": "source total mass minus source remnant mass, ISCO-evolved remnant estimate (generic PESummary definition)",
+      "independent_definition_reviewed": false
+    },
+    {
+      "observable": "peak_luminosity",
+      "exact_field": "peak_luminosity",
+      "official_definition_url": "https://lscsoft.docs.ligo.org/pesummary/stable/core/file_formats.html",
+      "release_id": "GWTC-5.0 stable release 9 / Zenodo 20348005+20348006",
+      "definition_sha256": "213f0a766abbf867f56c483538ed91cc772a3d13247974ef6eaec90a0b99b1a2",
+      "units": "10^56 erg/s (generic PESummary labels; release binding unverified)",
+      "frame_convention": "GW peak luminosity from ISCO-evolved spins; release-specific frame/model metadata not established",
+      "independent_definition_reviewed": false
+    }
+  ],
+  "analysis_ready": false,
+  "remaining": [
+    "Bind official release producer version and remnant-fit settings to definitions",
+    "Validate secondary values, missingness and cross-version consistency",
+    "Independently review release-specific definitions",
+    "Freeze transforms, sample/selection, frequency/phase and full exploratory-family null before scoring"
+  ],
+  "no_secondary_statistics_evaluated": true
+}
