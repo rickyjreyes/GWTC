@@ -1,0 +1,90 @@
+{
+  "schema": "GWTC_BASELINE_V2_ACCEPTANCE_RECONCILIATION_V1",
+  "gates": {
+    "training_cv": {
+      "status": "ARCHIVED_REQUIRES_PROVENANCE_REVIEW",
+      "path": "tables/gwtc_baseline_v2_cv.csv",
+      "sha256": "1b7f850048b4a7aec0159599a5a1f98d4e7432c336c4047d1bc1c9959f2337f9"
+    },
+    "training_selected_nonpolynomial_KDE": {
+      "status": "ARCHIVED_REQUIRES_PROVENANCE_REVIEW",
+      "path": "tables/gwtc_v3_frozen_unbinned_kde_mode.json",
+      "sha256": "2aef8999c51fe30917c78e0543a0a125a50cf0404298699758b589f9338087ff"
+    },
+    "unbinned_holdout": {
+      "status": "ARCHIVED_REQUIRES_PROVENANCE_REVIEW",
+      "path": "tables/gwtc_v3_unbinned_kde_holdout_result.csv",
+      "sha256": "ada3f5fe8878d2610b2cbb11d557f17c0bf3f657f79e234a4b3395a8c4cae220"
+    },
+    "frozen_holdout_manifest": {
+      "status": "ARCHIVED_REQUIRES_PROVENANCE_REVIEW",
+      "path": "tables/gwtc_holdout_manifest.csv",
+      "sha256": "574c2fea0024571e9ddf607b3a0db953cb83f4673d9647629235c56dbfaa4f03"
+    },
+    "fixed_mode_no_rescan_holdout": {
+      "status": "ARCHIVED_REQUIRES_PROVENANCE_REVIEW",
+      "path": "tables/gwtc_frozen_holdout_result.csv",
+      "sha256": "18609b7eb9f5daf4cdd491d308a1a86b69ea9c9cd131b9ff6f9aa0b22eef003a"
+    },
+    "historical_negative_outcome_registry": {
+      "status": "ARCHIVED_REQUIRES_PROVENANCE_REVIEW",
+      "path": "tables/gwtc4_population_global_result.json",
+      "sha256": "d329ff164dcfc028331dd15f2753c03c556cfba145e6f474f294f415678a929b"
+    },
+    "posterior_measurement_uncertainty": {
+      "status": "EXECUTED_COMPLETE_COVERAGE_DIAGNOSTIC_REQUIRES_SCIENTIFIC_REVIEW",
+      "result_sha256": "b7a97d89f2bd88877a532245cc2756516f4add673e254e4fcc96c52b7013f18a",
+      "n_events": 104,
+      "n_expected": 104,
+      "mean_minus_point": -1.8413511116292902,
+      "posterior_draw_quantiles": [
+        1.933673108905612,
+        8.127966519492126,
+        14.24499662247492
+      ]
+    },
+    "archived_cross_file_consistency": {
+      "status": "ARCHIVED_CONSISTENT_NOT_PROSPECTIVE_REPLICATION",
+      "training_n": 173,
+      "holdout_positive_n": 104,
+      "v2_selected_polynomial_degree": 7,
+      "v3_baseline": "training-only Gaussian KDE",
+      "v2_frozen_k": 9.602325620315224,
+      "v3_frozen_k": 9.794117647058822,
+      "v2_reference_p": 0.0012998700129987,
+      "v3_reference_p": 0.0008999100089991,
+      "v2_nyquist_k": 28.273762790192603,
+      "frozen_csv_byte_provenance": {
+        "manifest": {
+          "file": "/workspace/scratch/60d1523812d8/GWTC/tables/gwtc_holdout_manifest.csv",
+          "declared_original_sha256": "90e3ae250f078396d7676cc2abe6169ca06cd7d7d9cea95aaaf5464a1ec43bf7",
+          "verification_status": "DECLARED_HASH_MATCHES_ONLY_LF_CRLF_TRANSFORM",
+          "checkout_sha256": "574c2fea0024571e9ddf607b3a0db953cb83f4673d9647629235c56dbfaa4f03",
+          "normalized_lf_sha256": "574c2fea0024571e9ddf607b3a0db953cb83f4673d9647629235c56dbfaa4f03",
+          "normalized_crlf_sha256": "90e3ae250f078396d7676cc2abe6169ca06cd7d7d9cea95aaaf5464a1ec43bf7",
+          "checkout_bytes": 24988,
+          "content_equivalence_scope": "Only LF-to-CRLF representation, not CSV parsing, field changes or line reordering"
+        },
+        "clean_table": {
+          "file": "/workspace/scratch/60d1523812d8/GWTC/tables/gwtc_events_clean.csv",
+          "declared_original_sha256": "2e856c7ff99fc081a02ff3a854f21b2cdab6eb2a1c1a7160071b062d67453ac1",
+          "verification_status": "DECLARED_HASH_MATCHES_ONLY_LF_CRLF_TRANSFORM",
+          "checkout_sha256": "d1820ebf0499c6e03a55de018221159ef7688a5b0add6706ed176056ebd8ee7c",
+          "normalized_lf_sha256": "d1820ebf0499c6e03a55de018221159ef7688a5b0add6706ed176056ebd8ee7c",
+          "normalized_crlf_sha256": "2e856c7ff99fc081a02ff3a854f21b2cdab6eb2a1c1a7160071b062d67453ac1",
+          "checkout_bytes": 94572,
+          "content_equivalence_scope": "Only LF-to-CRLF representation, not CSV parsing, field changes or line reordering"
+        }
+      },
+      "interpretation": "V3 is a robustness reanalysis of previously inspected GWTC-5. The earlier pre-strict CV had holdout exposure. No new independent replication."
+    }
+  },
+  "original_holdout_provenance_caveat": "Earlier pre-strict CV had already seen holdout; do not claim an untouched independent historical replication.",
+  "classification": "PARTIAL_CLASS_III_NOT_PROMOTED",
+  "promotion": false,
+  "unresolved_dependencies": [
+    "#8 full selection/population challenge",
+    "#18 unseen prospective replication"
+  ],
+  "scientific_verdict": "POSTERIOR_DIAGNOSTIC_DONE_REQUIRE_SCIENTIFIC_INTERPRETATION_AND_ORIGINAL_GATE_AUDIT"
+}

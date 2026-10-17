@@ -1,0 +1,256 @@
+{
+  "schema": "GWTC_RANKS29_38_EXECUTION_RECEIPT_V1",
+  "review_date_utc": "2026-10-17",
+  "repository": "rickyjreyes/GWTC",
+  "pr": 23,
+  "branch": "agent/ranks29-38-execution-20261015",
+  "baseline_commit": "09b3aabd77dc40d98df06dee529dfb420f3591fa",
+  "baseline_pr": 19,
+  "merged_implementation_commit": "49b9f7849c6533605acf835f151cdcddd4ce52c9",
+  "previous_evidence_commit": "859e20c288dc0b968466da403b44f786e6c6199c",
+  "official_execution": {
+    "workflow_run": 38938072587,
+    "head": "bde312c022033c64cb3c25a3637add2a63d2e9f9",
+    "all_17_jobs": "success",
+    "events": 104,
+    "raw_bytes_verified": 55134074468,
+    "posterior_samples": 1742285
+  },
+  "validation": {
+    "local_full_suite": "178 passed",
+    "command": "python -m pytest -q --basetemp=/tmp/gwtc_final_pytest",
+    "offline_official_version_replay": "exact match: results, identity reconciliation, 278 preferred-PE metadata records",
+    "complete_posterior_gate_replay": "passed; no scientific classification promotion",
+    "posterior_numeric_replay": "exact match to CI output",
+    "direct_empirical_moment_check": "passed; MC mean differs by 0.5301 MC standard errors"
+  },
+  "issue_outcomes": {
+    "3": {
+      "classification": "PASS_CLOSED",
+      "scope": "Original execution criteria and scientific review; historical PARTIAL/Class III unchanged"
+    },
+    "11": {
+      "classification": "PASS_CLOSED",
+      "scope": "Official posterior measurement-uncertainty diagnostic; not hierarchical inference"
+    },
+    "10": {
+      "classification": "BLOCKED_EXTERNAL",
+      "blocker": "Original event-level historical subset summary unavailable; zero outer null catalogs executed"
+    },
+    "12": {
+      "classification": "PARTIAL_OPEN",
+      "blocker": "Immutable authoritative cumulative as-of manifests and version-selection policy remain absent; current official incremental audit executed"
+    },
+    "13": {
+      "classification": "PARTIAL_OPEN",
+      "blocker": "Release-specific producer/frame/fit definition binding, secondary value/version validation and frozen exploratory null-family execution remain"
+    }
+  },
+  "frozen_science": {
+    "historical_classification": "PARTIAL_CLASS_III_NOT_PROMOTED",
+    "historical_negative_results": "Preserved without overwrite",
+    "new_unseen_replication": false,
+    "hierarchical_population_and_selection_test": false,
+    "secondary_scans_run": false,
+    "posterior_calibrated_p": null
+  },
+  "artifact_retention": "Actions archives are temporary; durable Git receipts record official URLs, sizes, MD5 and SHA256. Full raw files and derivative HDF5 are excluded from this commit.",
+  "files": {
+    ".github/workflows/gwtc-tests.yml": {
+      "bytes": 4481,
+      "sha256": "8b8187ca42ac73cf19907ea599cd71c944c3f1c0d1b5726d8f3ed25726696be8"
+    },
+    ".github/workflows/official-pe-execution.yml": {
+      "bytes": 2580,
+      "sha256": "b4c5807aa54438303ac9feaf6b37d62f4b425a4911ab656ec2ad09c803ec8446"
+    },
+    "docs/BASELINE_V2_GATE_RECONCILIATION.md": {
+      "bytes": 7237,
+      "sha256": "eff3d7c1532449eb8d8eb5260f72a48f9f100a8f6ec6b0a3d6c1b6b01e93b17d"
+    },
+    "docs/HISTORICAL_COHERENCE_OBSTRUCTION_2026-10-16.md": {
+      "bytes": 3130,
+      "sha256": "d5ed44c9307807fe52cf07cdc594ff93bc86bb4f8dd9bcc9d0a8d0484e50889b"
+    },
+    "docs/OFFICIAL_VERSION_EXECUTION_2026-10-16.md": {
+      "bytes": 6080,
+      "sha256": "99f46c3eabbb1b8809421994df417db54826a84af76684a1113c0e68bc2e4ce1"
+    },
+    "docs/POSTERIOR_EXECUTION_2026-10-16.md": {
+      "bytes": 6574,
+      "sha256": "8dd70b5dcc9c73d00e113e12ff6d8b661c2c18a90bb33c5d39ae377d00a605b0"
+    },
+    "docs/SECONDARY_FIELDS_EXECUTION_2026-10-16.md": {
+      "bytes": 4004,
+      "sha256": "3940cf93b09593aeb176a113a64c3ecd81e518ee2c919c4ef13f7d97403aa743"
+    },
+    "figures/official_posterior_2026-10-16.svg": {
+      "bytes": 97422,
+      "sha256": "8cd1fc6d4a8b5de1fa35f3bc0be4ef849ff037d722ffefbcfc10b38542d96718"
+    },
+    "results/official_2026-10-15/attempt1/source_receipts.json.gz": {
+      "bytes": 23335,
+      "sha256": "f7f2e2dabf9ac3f54cfc545ec8e11c1877335b6bfad73daf4f32a0e882dce31a"
+    },
+    "results/official_2026-10-15/attempt1/verified_receipts.json.gz": {
+      "bytes": 19459,
+      "sha256": "b09b7fb2e8936aaff0326e31a738c97836d6d43d2dcd673a7931258e82a378ff"
+    },
+    "results/official_2026-10-15/baseline_v2_gate_complete.json": {
+      "bytes": 4639,
+      "sha256": "2adada8cd5dde5832f0869636f94a321bdd13710fabd4928111d3e71b17b48fa"
+    },
+    "results/official_2026-10-15/baseline_v2_original_acceptance_review.json": {
+      "bytes": 2675,
+      "sha256": "6df387757aa072094c4697b29ee8028ea68867b56ef8c4747c115efe2edb5226"
+    },
+    "results/official_2026-10-15/coherence_preflight.json": {
+      "bytes": 2739,
+      "sha256": "2fca6e191e75c5d944894d5f118a08d3b1888ce4de36cc2d133b6bbb2a95900f"
+    },
+    "results/official_2026-10-15/metadata_snapshot_receipt.json": {
+      "bytes": 34265,
+      "sha256": "1f5b7ed735aef105d716a9ea05371139f684d6e589fcf32ea87a96134d9b4d9b"
+    },
+    "results/official_2026-10-15/metadata_snapshots.tar.gz": {
+      "bytes": 322905,
+      "sha256": "60fb4d804b3193c267597bf8690190e7759707cd8ca48972a47ab00f7c345bc9"
+    },
+    "results/official_2026-10-15/pe_input_mapping.json": {
+      "bytes": 112983,
+      "sha256": "cd62562eaea07f6fe3eeab3ea9081b4b43983d8d3f5a7bf90e6da2e14bc9c254"
+    },
+    "results/official_2026-10-15/posterior_execution/diagnostic.json": {
+      "bytes": 83245,
+      "sha256": "b7a97d89f2bd88877a532245cc2756516f4add673e254e4fcc96c52b7013f18a"
+    },
+    "results/official_2026-10-15/posterior_execution/local_diagnostic.json": {
+      "bytes": 87091,
+      "sha256": "f7c23c949ba8ed8abdd778ca931d93e8e52c9ca7524e961d6bef8e85e89c29a0"
+    },
+    "results/official_2026-10-15/posterior_execution/local_point_vs_posterior.csv": {
+      "bytes": 43582,
+      "sha256": "9664f6e20137369558f318c049929e8d791471237530103381bf84eef9bbfa08"
+    },
+    "results/official_2026-10-15/posterior_execution/moment_check.json": {
+      "bytes": 918,
+      "sha256": "2a97bc8ce22983529343e739bfaef79fcc8e1fed234df74868605fe9127dcdf3"
+    },
+    "results/official_2026-10-15/posterior_execution/point_vs_posterior.csv": {
+      "bytes": 39736,
+      "sha256": "1682746b4eea3bc5d3a3820ac906ffd841cbfe9f881103a999b2d9e0c68a948d"
+    },
+    "results/official_2026-10-15/posterior_execution/posterior_manifest.csv": {
+      "bytes": 26892,
+      "sha256": "c12010da857e49df06697931ee87104cc96b3a171b3f2612d5c440823960d78b"
+    },
+    "results/official_2026-10-15/posterior_execution/review.json": {
+      "bytes": 1567,
+      "sha256": "47d6961d91ff3958b16e7aef382a361c78adf2fe961e36048c4d8134f6d83c7c"
+    },
+    "results/official_2026-10-15/posterior_execution/source_receipts.json.gz": {
+      "bytes": 33216,
+      "sha256": "df96de2aaa0e053cade240837775241ab71b5f1b41bcba28d276a06ed179e870"
+    },
+    "results/official_2026-10-15/posterior_workflow_artifacts.json": {
+      "bytes": 13925,
+      "sha256": "2e460393adef9affc1ae317bc196d3bf082e1cc2a9c0dd9a262264e1e56fc30e"
+    },
+    "results/official_2026-10-15/secondary_coverage_attempt1.csv": {
+      "bytes": 76335,
+      "sha256": "d26295f27f393392dad6f1c6b419ccbdf6b61afce2814e3e190bec603b45bf1a"
+    },
+    "results/official_2026-10-15/secondary_coverage_complete.csv": {
+      "bytes": 88575,
+      "sha256": "cc67e8ed3d091660be8c488e9dd9643b351615462a441f01e4566f679632cf81"
+    },
+    "results/official_2026-10-15/secondary_definition_sources.tar.gz": {
+      "bytes": 10219,
+      "sha256": "9f40d9233fdf895743598427f725950e1fa087bd5e4f67fcc75be7a43515abfd"
+    },
+    "results/official_2026-10-15/secondary_definitions_review.json": {
+      "bytes": 2249,
+      "sha256": "d35347ad9354aebc35e8e59c8ffeac8bf7c1c4053fa7eabca99456a9347e06c2"
+    },
+    "results/official_2026-10-15/secondary_preflight_attempt1_rows.csv": {
+      "bytes": 82201,
+      "sha256": "58171e2d505c4f109dc4425c42357da0704615a6a1f87982fe2059ceb2a662cd"
+    },
+    "results/official_2026-10-15/secondary_preflight_attempt1_summary.json": {
+      "bytes": 494,
+      "sha256": "3573ef0f8f0668d4da481af7c3862a7e31bff2ad8b7477ebd01f1cf699fee576"
+    },
+    "results/official_2026-10-15/secondary_preflight_complete_rows.csv": {
+      "bytes": 83101,
+      "sha256": "5b82f138ff3f90866df010bec87955a36c3b44969fb5fa1342d55d99ce56c9e5"
+    },
+    "results/official_2026-10-15/secondary_preflight_complete_summary.json": {
+      "bytes": 494,
+      "sha256": "7945841fbe5094dc1ad008c3fc6998202ae67af8f2f9bbeb7433a0d426051fe3"
+    },
+    "results/official_2026-10-15/version_execution/GWTC-4.0_manifest.csv": {
+      "bytes": 23690,
+      "sha256": "69ca6fc81303915fc535994656c7ef6a127fed329fa61a675887eff6de021a6d"
+    },
+    "results/official_2026-10-15/version_execution/GWTC-4.1_manifest.csv": {
+      "bytes": 25533,
+      "sha256": "270f3ccbb2d2a46d7d21ebcfd1ffa2942726833861ffd09e4ef74af2d4e3c85c"
+    },
+    "results/official_2026-10-15/version_execution/GWTC-5.0_manifest.csv": {
+      "bytes": 29471,
+      "sha256": "056104c4d628ddd4d4c58a47f17ab8a6ec9abab490e80b58f71d066449c1ae3d"
+    },
+    "results/official_2026-10-15/version_execution/event_diff.csv": {
+      "bytes": 36961,
+      "sha256": "62de03604c72f4c72a53c7eb64ed77d42786eba0cd4b8bef6d1a29191a1f4d76"
+    },
+    "results/official_2026-10-15/version_execution/results.json": {
+      "bytes": 178095,
+      "sha256": "f07788b665192081f4c4727f55ccc18e49dee4195ef0977d3823951a89c4deb8"
+    },
+    "results/official_2026-10-15/version_execution/score_change_ledger.csv": {
+      "bytes": 76995,
+      "sha256": "c91e12e338f8ff94536b568e9ac73d726ce3fbc27f34e12609d1a4329f254a99"
+    },
+    "scripts/check_official_posterior_moments.py": {
+      "bytes": 2943,
+      "sha256": "18206ca8d1abe28b865cdc0dbaf689e316b1c23716aa81d370efeaacf123e925"
+    },
+    "scripts/gwtc_official_version_execution.py": {
+      "bytes": 6807,
+      "sha256": "a477f3cf81dee45e897a955c6530d9414178f857c88d84ee0e68dbf04273ab12"
+    },
+    "scripts/gwtc_posterior_uncertainty.py": {
+      "bytes": 10563,
+      "sha256": "da5042cf30154998b4a623795e7c660e63ae2092933de80d56184fe6ec7ee885"
+    },
+    "scripts/gwtc_secondary_receipt_audit.py": {
+      "bytes": 2074,
+      "sha256": "d86ccb69858796bb72e0cf80ce1f56d6427bc44e8532efa1dcbb11134a1b48d0"
+    },
+    "scripts/plot_official_posterior_comparison.py": {
+      "bytes": 2939,
+      "sha256": "905f47342271b8c315e9053d4bfc03f60c77f4b984b0dc71c61305872f56ddff"
+    },
+    "scripts/record_historical_coherence_preflight.py": {
+      "bytes": 2088,
+      "sha256": "453988204c2f7fad491cb2364515e7be25c6f225c879ea1b3ce2e3703eda7232"
+    },
+    "scripts/recover_official_pe_inputs.py": {
+      "bytes": 7783,
+      "sha256": "653168a4d70dc8bfe6c63b32082a595605bda13fce50c5a0848fa49781afc9d4"
+    },
+    "scripts/run_official_pe_shard.py": {
+      "bytes": 6447,
+      "sha256": "1979c41c6a7102e5113c3ac8cf72e25b2b9f6dfa6321f5c422252de96a607958"
+    },
+    "tests/test_official_pe_recovery.py": {
+      "bytes": 3153,
+      "sha256": "9db19a8a5493014a9270a2414b534ef07a7ba5273e1527a5eeeed99cbaa2b364"
+    },
+    "tests/test_official_version_execution.py": {
+      "bytes": 1513,
+      "sha256": "ac926e33bcfe5f4f6fa7696a0f927c502ea0c69fb85822bdbf95bd8c0013ddc9"
+    }
+  }
+}

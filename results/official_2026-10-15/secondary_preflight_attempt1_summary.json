@@ -1,0 +1,10 @@
+{
+  "schema": "GWTC_SECONDARY_PREFLIGHT_V1",
+  "coverage_sha256": "d26295f27f393392dad6f1c6b419ccbdf6b61afce2814e3e190bec603b45bf1a",
+  "definitions_sha256": "d35347ad9354aebc35e8e59c8ffeac8bf7c1c4053fa7eabca99456a9347e06c2",
+  "blocked_rows": 208,
+  "conditional_rows": 0,
+  "scientific_status": "NO_SCANS_OR_NULL_CALIBRATION_PERFORMED",
+  "next_gate": "Predeclare transforms, missingness, version compatibility and complete exploratory null family before analysis.",
+  "calibrated_p": null
+}

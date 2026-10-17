@@ -1,0 +1,40 @@
+{
+  "schema": "GWTC_OFFICIAL_POSTERIOR_EXECUTION_REVIEW_V1",
+  "classification": "PASS_CLOSED",
+  "scientific_verdict": "POSITIVE_FIXED_MODE_SCORE_PRESERVED_WITH_MEAN_ATTENUATION",
+  "ci_run": 38938072587,
+  "execution_head": "bde312c022033c64cb3c25a3637add2a63d2e9f9",
+  "ci_diagnostic_sha256": "b7a97d89f2bd88877a532245cc2756516f4add673e254e4fcc96c52b7013f18a",
+  "local_diagnostic_sha256": "f7c23c949ba8ed8abdd778ca931d93e8e52c9ca7524e961d6bef8e85e89c29a0",
+  "exact_ci_local_numeric_replay": true,
+  "compared_fields": [
+    "coverage",
+    "input_events",
+    "draws",
+    "seed",
+    "point_statistic_on_matched_events",
+    "posterior_draw_score_mean",
+    "posterior_draw_score_quantiles_05_50_95",
+    "posterior_draw_fraction_statistic_positive"
+  ],
+  "posterior_samples_total": 1742285,
+  "posterior_samples_min_max": [
+    10825,
+    40000
+  ],
+  "weight_ess_min_max": [
+    10824.999999999996,
+    40000.0
+  ],
+  "ess_interpretation": "Kish ESS of equal posterior weights; not autocorrelation-adjusted chain ESS",
+  "exact_sum_event_posterior_mean": 8.089216162801492,
+  "draw_mean": 8.108834467977811,
+  "calibrated_p": null,
+  "historical_scientific_status": "PARTIAL_CLASS_III_NOT_PROMOTED",
+  "raw_bytes_verified": 55134074468,
+  "raw_receipts_complete": true,
+  "secondary_values_not_saved_by_chirp_projection": true,
+  "closure_scope": "Original measurement-uncertainty diagnostic execution; no physics promotion",
+  "relative_monte_carlo_mean_attenuation": 0.1850569616915626,
+  "relative_exact_empirical_mean_attenuation": 0.18702861388029435
+}

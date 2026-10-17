@@ -16,6 +16,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 import pandas as pd
+from gwtc_source_provenance import validate_frozen_csv
 
 def file_sha(path):
     h = hashlib.sha256()
@@ -96,8 +97,10 @@ def main():
     freeze = json.loads(args.frozen.read_text())
     if freeze["schema"] != "GWTC_V4_STRUCTURED_NULL_FIXED_PREDICTION_V1" or float(freeze["k_pred"]) != 9.7:
         raise SystemExit("Expected exact frozen V4 model")
-    if file_sha(args.table) != freeze["clean_table_sha256"] or file_sha(args.holdout_manifest) != freeze["manifest_sha256"]:
-        raise SystemExit("Changed input table or holdout manifest")
+    # Preserve the frozen Windows receipts while allowing only LF/CRLF checkout
+    # representation changes; changed values/order still fail closed.
+    table_provenance=validate_frozen_csv(args.table,freeze["clean_table_sha256"])
+    holdout_provenance=validate_frozen_csv(args.holdout_manifest,freeze["manifest_sha256"])
     if args.draws < 2: raise SystemExit("At least two posterior-draw realizations required")
     manifest = pd.read_csv(args.posterior_manifest, keep_default_na=False)
     required = ["event_name","path","dataset_path","sha256","source_url","weight_path"]
@@ -146,6 +149,7 @@ def main():
          "scientific_status":"POSTERIOR_DRAW_DIAGNOSTIC_NOT_HIERARCHICAL_NOT_CALIBRATED",
          "frozen_sha256":file_sha(args.frozen),"manifest_sha256":file_sha(args.posterior_manifest),
          "table_sha256":file_sha(args.table),"holdout_manifest_sha256":file_sha(args.holdout_manifest),
+         "frozen_csv_byte_provenance":{"table":table_provenance,"holdout":holdout_provenance},
          "holdout_manifest_rows":len(expected),"holdout_expected_positive_mass":len(expected_positive),
          "input_events":len(events),
          "missing_event_names":sorted(expected_positive-input_names),
