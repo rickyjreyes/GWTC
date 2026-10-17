@@ -1,0 +1,18 @@
+{
+  "schema": "GWTC_EMPIRICAL_POSTERIOR_MOMENT_CHECK_V1",
+  "diagnostic_sha256": "b7a97d89f2bd88877a532245cc2756516f4add673e254e4fcc96c52b7013f18a",
+  "mapping_sha256": "cd62562eaea07f6fe3eeab3ea9081b4b43983d8d3f5a7bf90e6da2e14bc9c254",
+  "events": 104,
+  "empirical_posterior_mean_statistic": 8.089216162801492,
+  "empirical_posterior_variance": 13.694856539925611,
+  "empirical_posterior_standard_deviation": 3.700656230984663,
+  "draws": 10000,
+  "draw_mean": 8.108834467977811,
+  "monte_carlo_standard_error_of_mean": 0.037006562309846634,
+  "draw_mean_minus_exact_mean": 0.01961830517631924,
+  "mc_standard_error_units": 0.5301304404354046,
+  "point_statistic": 9.950185579607101,
+  "relative_exact_mean_attenuation": 0.18702861388029435,
+  "calibrated_p": null,
+  "interpretation": "Empirical posterior expectation of additive log statistic, not log of an integrated likelihood or a hierarchical Bayes factor"
+}

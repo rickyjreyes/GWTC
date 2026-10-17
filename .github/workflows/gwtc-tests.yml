@@ -37,3 +37,45 @@ jobs:
           name: gwtc-targeted-audits
           path: ${{ runner.temp }}/gwtc_targeted/
           if-no-files-found: error
+      - name: Verify and replay pinned official version metadata offline
+        run: |
+          python - <<'PY'
+          import hashlib,io,json,os,pathlib,tarfile
+          root=pathlib.Path('results/official_2026-10-15')
+          receipt=json.loads((root/'metadata_snapshot_receipt.json').read_text())
+          data=(root/'metadata_snapshots.tar.gz').read_bytes()
+          assert hashlib.sha256(data).hexdigest()==receipt['archive_sha256']
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'official_metadata'
+          dest.mkdir()
+          with tarfile.open(fileobj=io.BytesIO(data),mode='r:gz') as archive:
+              assert set(archive.getnames())==set(receipt['files'])
+              for member in archive:
+                  assert member.isfile() and not pathlib.PurePosixPath(member.name).is_absolute()
+                  assert '..' not in pathlib.PurePosixPath(member.name).parts
+                  content=archive.extractfile(member).read()
+                  assert hashlib.sha256(content).hexdigest()==receipt['files'][member.name]
+                  path=dest/member.name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(content)
+          PY
+          python scripts/gwtc_official_version_execution.py --sources "${RUNNER_TEMP}/official_metadata" --output "${RUNNER_TEMP}/official_version_replay"
+          python - <<'PY'
+          import json,os,pathlib
+          expected=json.loads(pathlib.Path('results/official_2026-10-15/version_execution/results.json').read_text())
+          actual=json.loads((pathlib.Path(os.environ['RUNNER_TEMP'])/'official_version_replay/results.json').read_text())
+          assert actual['results']==expected['results']
+          assert actual['identity_reconciliation']==expected['identity_reconciliation']
+          assert actual['preferred_PE_metadata']==expected['preferred_PE_metadata']
+          PY
+      - name: Reconcile complete official posterior execution with original baseline gate
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,pathlib,subprocess,sys
+          p=pathlib.Path('results/official_2026-10-15/posterior_execution/diagnostic.json')
+          digest=hashlib.sha256(p.read_bytes()).hexdigest()
+          assert digest=='b7a97d89f2bd88877a532245cc2756516f4add673e254e4fcc96c52b7013f18a'
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'baseline_v2_complete.json'
+          subprocess.run([sys.executable,'scripts/gwtc_baseline_v2_acceptance.py','--posterior-result',str(p),'--posterior-sha256',digest,'--output',str(out)],check=True)
+          result=json.loads(out.read_text())
+          assert result['classification']=='PARTIAL_CLASS_III_NOT_PROMOTED'
+          assert result['gates']['posterior_measurement_uncertainty']['n_events']==104
+          assert result['gates']['posterior_measurement_uncertainty']['status']=='EXECUTED_COMPLETE_COVERAGE_DIAGNOSTIC_REQUIRES_SCIENTIFIC_REVIEW'
+          PY

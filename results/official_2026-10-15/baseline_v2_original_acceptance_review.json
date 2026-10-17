@@ -1,0 +1,61 @@
+{
+  "schema": "GWTC_ORIGINAL_BASELINE_EXECUTION_CRITERION_REVIEW_V1",
+  "review_date_utc": "2026-10-17",
+  "classification": "PASS_CLOSED",
+  "issue": 3,
+  "closure_scope": "Original execution and documented interpretation task; not physical promotion or retroactive unseen prediction",
+  "scientific_classification": "PARTIAL_CLASS_III_NOT_PROMOTED",
+  "criteria": [
+    {
+      "criterion": "CV on canonical chirp-mass training data",
+      "disposition": "SATISFIED",
+      "evidence": "scripts/run_baseline_v2_cv.py; tables/gwtc_baseline_v2_cv.csv"
+    },
+    {
+      "criterion": "Non-polynomial smooth background selected on training predictive fit",
+      "disposition": "SATISFIED",
+      "evidence": "V3 training-only KDE LOO; tables/gwtc_v3_frozen_unbinned_kde_mode.json"
+    },
+    {
+      "criterion": "Unbinned cross-check",
+      "disposition": "SATISFIED",
+      "evidence": "Archived V3 unbinned evaluator and results"
+    },
+    {
+      "criterion": "Freeze holdout manifest before declared residual evaluation",
+      "disposition": "SATISFIED_WITH_RECORDED_PROVENANCE_LIMITATION",
+      "evidence": "V1 protocol manifest/frozen mode; earlier pre-strict CV had already exposed this holdout, so no unseen prediction is claimed"
+    },
+    {
+      "criterion": "Evaluate training-selected frozen mode without rescanning k",
+      "disposition": "SATISFIED",
+      "evidence": "Archived strict V1 holdout result and V2/V3 frequency consistency checks"
+    },
+    {
+      "criterion": "Propagate posterior measurement uncertainty",
+      "disposition": "SATISFIED",
+      "evidence": "104 verified official PE products; diagnostic, paired CSV, exact local replay and direct empirical moments"
+    },
+    {
+      "criterion": "Preserve PARTIAL/Class III unless all promotion gates pass",
+      "disposition": "SATISFIED",
+      "evidence": "PARTIAL_CLASS_III_NOT_PROMOTED retained; #8 and #18 remain open"
+    },
+    {
+      "criterion": "Preserve negative outcomes",
+      "disposition": "SATISFIED",
+      "evidence": "Historical N0-N3 and V1-V4 artifacts unchanged"
+    }
+  ],
+  "scientific_review": "Positive fixed-mode score preserved with 18.7% attenuation in exact empirical posterior mean; broad posterior spread is not a calibrated p-value, hierarchical likelihood, or Bayes factor. Earlier holdout exposure remains irreversible.",
+  "diagnostic_sha256": "b7a97d89f2bd88877a532245cc2756516f4add673e254e4fcc96c52b7013f18a",
+  "gate_result": "baseline_v2_gate_complete.json",
+  "manual_review_docs": [
+    "docs/BASELINE_V2_GATE_RECONCILIATION.md",
+    "docs/POSTERIOR_EXECUTION_2026-10-16.md"
+  ],
+  "unchanged_future_obligations": [
+    8,
+    18
+  ]
+}
